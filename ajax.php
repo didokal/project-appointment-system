@@ -2,10 +2,8 @@
 $conexion = new mysqli("localhost", "root", "", "citas2", "3306");
 
 
-
 function intervaloHora($hora_inicio, $hora_fin, $intervalo = 15)
 {
-
     $hora_inicio = new DateTime($hora_inicio);
     $hora_fin = new DateTime($hora_fin);
     $hora_fin->modify('+1 second'); // Añadimos 1 segundo para que muestre $hora_fin
@@ -13,25 +11,16 @@ function intervaloHora($hora_inicio, $hora_fin, $intervalo = 15)
     // Si la hora de inicio es superior a la hora fin
     // añadimos un día más a la hora fin
     if ($hora_inicio > $hora_fin) {
-
         $hora_fin->modify('+1 day');
     }
 
     // Establecemos el intervalo en minutos
-
     $intervalo = new DateInterval('PT' . $intervalo . 'M');
 
     // Sacamos los periodos entre las horas
     $periodo = new DatePeriod($hora_inicio, $intervalo, $hora_fin);
 
-
     foreach ($periodo as $hora) {
-
-        // Guardamos las horas intervalos
-        /*if(hora == "10:30:00"){
-            $horas[] =  $hora->format('H:i:s') . "aqui";
-        }
-        */
         $horas[] = $hora->format('H:i');
     }
 
@@ -39,13 +28,37 @@ function intervaloHora($hora_inicio, $hora_fin, $intervalo = 15)
 }
 
 
+function intervaloHora_alreves($hora_fin, $hora_inicio, $intervalo = 15)
+{
+    $array_d = array();
+    $array_d2 = array();
+    $hora_inicio = new DateTime($hora_inicio);
+    $hora_fin = new DateTime($hora_fin);
+    $hora_fin->modify('+1 second'); // Añadimos 1 segundo para que muestre $hora_fin
 
+    // Si la hora de inicio es superior a la hora fin
+    // añadimos un día más a la hora fin
+    if ($hora_inicio > $hora_fin) {
+        $hora_fin->modify('+1 day');
+    }
 
+    // Establecemos el intervalo en minutos
+    $intervalo = new DateInterval('PT' . $intervalo . 'M');
 
+    // Sacamos los periodos entre las horas
+    $periodo = new DatePeriod($hora_inicio, $intervalo, $hora_fin);
 
+    foreach ($periodo as $hora) {
+        array_push($array_d, $hora->format('H:i'));
+    }
 
+    for ($x = count($array_d) - 1; $x >= 0; $x--) {
 
+        array_push($array_d2, $array_d[$x]);
+    }
 
+    return $array_d2;
+}
 
 
 if ($_REQUEST["pagg"] == 1) {
@@ -62,8 +75,6 @@ if ($_REQUEST["pagg"] == 1) {
         }
 
 
-
-
     } else {
         $servicio = $_REQUEST["servicio"];
 
@@ -75,7 +86,7 @@ if ($_REQUEST["pagg"] == 1) {
     }
 
 
-} elseif($_REQUEST["pagg"] == 2){
+} elseif ($_REQUEST["pagg"] == 2) {
     $fecha = $_REQUEST["fecha"];
     $empleado = $_REQUEST["empleado"];
     $servicio = $_REQUEST["servicio"];
@@ -83,25 +94,20 @@ if ($_REQUEST["pagg"] == 1) {
     echo $diaSemana . "<br>";
 
 
-
     $resultado = mysqli_query($conexion, "SELECT duracionServ FROM `servicios` WHERE `nombreServ` = '$servicio'");
     while ($row = mysqli_fetch_array($resultado)) {
         $duracion_servicio_seleccionado = $row[0];
     }
-    $duracion_servicio_seleccionado = $duracion_servicio_seleccionado/15;
-    $duracion_servicio_seleccionado = ($duracion_servicio_seleccionado+1);  //le sumo uno para el descanso de 15min
+    $duracion_servicio_seleccionado = $duracion_servicio_seleccionado / 15;
+    $duracion_servicio_seleccionado = ($duracion_servicio_seleccionado + 1);  //le sumo uno para el descanso de 15min
     echo "Nombre del servicio = " . $servicio . " con duracion de = $duracion_servicio_seleccionado<br>";
 
 
-
-
     $duracion_servicio = 0;
-    $duracion_prueba= 0;
+    $duracion_prueba = 0;
     $array_horas_para_eliminar = array();
-    $array_horario = array();
+    $array_horario = array();                   //full horario sin tocar
     $array_reservas_duracion = array();
-
-
 
 
     //sacamos el idEmple del empleado
@@ -112,8 +118,7 @@ if ($_REQUEST["pagg"] == 1) {
     if ($contador_id_emple != 0) {
         $idEmple = mysqli_fetch_array($resultado_id_emple)[0];
     }
-    echo "ID EMPLEADO =>> $idEmple<br>";
-
+    echo "ID EMPLEADO =>> $idEmple<br><br>";
 
 
     //sacamos el horario del empleado del dia seleccionado
@@ -131,11 +136,10 @@ if ($_REQUEST["pagg"] == 1) {
     echo "HORARIO SELECCIONADO EMPLEADO FIN =>> $horario_empleado_fin<br>";
 
 
-
+    //rellenamos el horario sin tocarlo, es el horario entre el START y el FIN
     foreach (intervaloHora($horario_empleado_start, $horario_empleado_fin, $intervalo = 15) as $hora) {
         array_push($array_horario, $hora);
     }
-
 
 
     //comprobamos si hay citas el empleado seleccionado en el dia seleccionado
@@ -158,13 +162,8 @@ if ($_REQUEST["pagg"] == 1) {
 
 
             echo "<span style='color:red'>DURACION PRUEBA SIN PARTIR: $duracion_servicio</span><br>";
-            $duracion_prueba = $duracion_servicio/15;
+            $duracion_prueba = $duracion_servicio / 15;
             echo "DURACION PRUEBA DIVIDIDA: $duracion_prueba<br><br>";
-
-
-
-
-
 
 
             $indice_inicio = "";
@@ -178,11 +177,8 @@ if ($_REQUEST["pagg"] == 1) {
                 //echo "<b>duracion dividida = $duracion_prueba</b><br><br>";
 
 
-
-
-
                 //si la hora coincide con la hora de la cita de la BD
-                if($hora == $hora_cita){
+                if ($hora == $hora_cita) {
                     //guardamos el indice inicio
                     $indice_inicio = $indice;
                     //la hora de inicio
@@ -194,9 +190,9 @@ if ($_REQUEST["pagg"] == 1) {
 
                 //si el indice del array el el mismo que el indice de inicio sumando lo que dura el servicio ($duracion_servicio DIVIDIDO entre 15minutos en este caso)
                 //sabremos cuantas casillas tenemos que saltar
-                if($indice == ($indice_inicio+$duracion_prueba) /* -1 pongo MENOS UNO y ya no habra descansos*/){
+                if ($indice == ($indice_inicio + $duracion_prueba) /* -1 pongo MENOS UNO y ya no habra descansos*/) {
                     //aqui controlo que no sea la primera vez que entra porque me agregaba un campo de mas
-                    if($indice_inicio != 0){
+                    if ($indice_inicio != 0) {
                         $hora_fin = $hora;
                         echo "DURACION FIN: $indice<br>";
                         echo "HORA FIN: $hora_fin<br><br>";
@@ -207,13 +203,17 @@ if ($_REQUEST["pagg"] == 1) {
             }
 
 
-
-
             //rellenamos el array con las horas (los intervalos de horas) que hay QUE NO HAY QUE MOSTRAR
             //hora inicio sera porejemplo 11:00 y hora fin sera 12:00
             //lo dificil es sacar la hora fin ya que no la sabesmos pero con lo realizado arriba funciona perfectamente
             foreach (intervaloHora($hora_inicio, $hora_fin, $intervalo = 15) as $hora) {
-                echo "Hora para eliminar: $hora<br>";
+
+                if ($hora == $hora_fin) {
+                    echo "<b>Hora para eliminar descanso: $hora, hasta +15min</b><br>";
+                } else {
+                    echo "Hora para eliminar: $hora<br>";
+                }
+
                 array_push($array_horas_para_eliminar, $hora);
             }
             echo "<br><br><br>";
@@ -222,67 +222,166 @@ if ($_REQUEST["pagg"] == 1) {
         echo "<br><br><br>";
 
 
+        ///este es el codigo que me hace la comprobacion si el servicio escogido por su duración cabe entre las reservas
+        /// ya existentes
 
-
-
+        /*
         $diferencia = 0;
         $indice_para_borar = "";
 
         echo "CONTADOR: " . count($array_reservas_duracion);
         for($x = 0; $x < count($array_reservas_duracion); $x++){
-
-
             if($x < count($array_reservas_duracion)-1){
                 echo "<h2>$x</h2>";
                 echo "<h4>" . $array_reservas_duracion[$x+1]["posicion1"] . "</h4>";
                 echo "<h4>" . $array_reservas_duracion[$x]["posicion2"] . "</h4>";
 
-
                 $diferencia = $array_reservas_duracion[$x+1]["posicion1"] - $array_reservas_duracion[$x]["posicion2"];
                 echo "DIFERENCIA ". $diferencia . "<br>";
 
-
-
-
                 if($diferencia <= $duracion_servicio_seleccionado){
                     echo "HAY QUE BORRARRR!<br>";
-                    for($i = $array_reservas_duracion[$x]["posicion2"]+1; $i <= $array_reservas_duracion[$x+1]["posicion1"]-1; $i++){
+
+                    echo $mayor = $array_reservas_duracion[$x]["posicion2"]+1;
+                    echo "<br>";
+                    echo $menor = $array_reservas_duracion[$x+1]["posicion1"]-1;
+                    echo "<br>";
+
+                    for($i = $mayor; $i <= $menor; $i++){
                         echo "<b> esta posicion $i</b>";
-                        echo "ASSSSSSSSSSSSSSSSSSSSSSSSSS";
                         for($o = 0; $o < count($array_horario); $o++){
                             if($o == $i){
-
                                 array_push($array_horas_para_eliminar, $array_horario[$o]);
+                                echo "borrado!";
                             }
                         }
                     }
                 }
-
-
             }
         }
-
-        //echo "ESTE ES EL INDICE = " . $indice_para_borar;
+*/
 
 
         echo "<br><br><br>Array con horas eliminadas<br>";
         print_r($array_horas_para_eliminar);
         echo "<br><br>";
-
-        $array_horario=array_diff($array_horario,$array_horas_para_eliminar);
+        $array_horario_horas_libres = array();
+        $array_horario_horas_libres = array_diff($array_horario, $array_horas_para_eliminar);
 
         echo "Array con horas que se muestran<br>";
-        print_r($array_horario);
+        print_r($array_horario_horas_libres);
 
 
+        echo "<h1>CONTINUAMOS...</h1>";
+        echo count($array_horario_horas_libres);
+        echo "<br>";
 
 
+        $array_prueba = array("inicio" => "", "fin" => "", "contador" => "", "contador2" => "");
+        $array_prueba_llenado = array();
+        $primera_vez = true;
+        $asignado = false;
+        $contador = 0;
+
+        for ($x = 0; $x < count($array_horario); $x++) {
+
+            if (array_key_exists($x, $array_horario_horas_libres)) {
+                echo $x . " = $array_horario_horas_libres[$x]<br>";
+                $contador++;
+
+                if ($primera_vez == true) {
+                    $array_prueba["inicio"] = $array_horario_horas_libres[$x];
+                    $primera_vez = false;
+                } else {
+                    $array_prueba["fin"] = $array_horario_horas_libres[$x];
+                    $array_prueba["contador"] = $contador;
+                    $asignado = false;
+
+                }
+
+            } else {
+                if ($asignado == false) {
+                    array_push($array_prueba_llenado, $array_prueba);
+                    $contador = 0;
+                    $asignado = true;
+                    $primera_vez = true;
+                }
+
+                echo $x . " esta vacio<br>";
+                $primera_vez = true;
+            }
 
 
+        }
+
+        var_dump($array_prueba_llenado);
+        $ultima_reserva_fin = "";
+
+        for ($x = 0; $x < count($array_prueba_llenado); $x++) {
+            echo $array_prueba_llenado[$x]["inicio"] . " = " . $array_prueba_llenado[$x]["fin"] . " = " . $array_prueba_llenado[$x]["contador"] . "<br>";
+            //guardamos el
+            $ultima_reserva_fin = $array_prueba_llenado[$x]["fin"];
+
+            $num_horas_que_no_borramos = ($array_prueba_llenado[$x]["contador"] - $duracion_servicio_seleccionado);
+            echo "quedan libres " . $num_horas_que_no_borramos;
+            echo "<br>";
+
+
+            $contador = 0;
+            echo "CONTADOR = " . $contador . "<br>";
+            foreach (intervaloHora_alreves($array_prueba_llenado[$x]["fin"], $array_prueba_llenado[$x]["inicio"], $intervalo = 15) as $hora) {
+
+                //filtramos para que si se da el caso de que la duración del servicio es de 2 franjas y el hueco que tenemos libre es de 3 franjas
+                //pues que elimine solo la ultima y nos deje elejir entre la primera franja y la ultima
+                if ($duracion_servicio_seleccionado == 2 && $array_prueba_llenado[$x]["contador"] == 3) {
+                    if ($contador + 1 < $duracion_servicio_seleccionado) {
+                        $contador++;
+                        echo "BORRAMOS = " . $hora . "<br>";
+                        array_push($array_horas_para_eliminar, $hora);
+                    } else {
+                        echo "$hora <br>";
+                    }
+                } else {
+                    if ($contador < $duracion_servicio_seleccionado) {
+                        $contador++;
+                        echo "BORRAMOS = " . $hora . "<br>";
+                        array_push($array_horas_para_eliminar, $hora);
+                    } else {
+                        echo "$hora <br>";
+                    }
+                }
+            }
+            echo "<br><br>";
+
+        }
+
+
+        echo "<h1>EL ULTIMO!</h1>";
+        $contador_el_ultimo = 0;
+        foreach (intervaloHora_alreves($horario_empleado_fin, $ultima_reserva_fin, $intervalo = 15) as $hora) {
+            $contador_el_ultimo++;
+        }
+
+        echo $contador_el_ultimo . "<br>";
+
+        $contador_igualacion = 1;
+
+        foreach (intervaloHora_alreves($horario_empleado_fin, $ultima_reserva_fin, $intervalo = 15) as $hora) {
+            $contador_igualacion++;
+            if ($contador_igualacion <= $duracion_servicio_seleccionado) {
+                echo "PARA BORRAR => " . $hora . "<br>";
+                array_push($array_horas_para_eliminar, $hora);
+            } else {
+                echo "$hora <br>";
+            }
+        }
+
+
+        $array_horario_horas_libres = array_diff($array_horario, $array_horas_para_eliminar);
 
 
         echo "<div id='diaSeleccionado'></div>";
-        foreach ($array_horario as $indice => $valor){
+        foreach ($array_horario_horas_libres as $indice => $valor) {
             echo "<button value='$valor' id='hora_opcion' class='$indice' onclick='show(3);guardar_valor_cookie_hora(this.value)'>" .
                 "<span id='hora_numeric'>" . $valor . "</span>" .
                 "<span id='buton_reservar'>Reserva ahora!</span>" .
@@ -290,26 +389,9 @@ if ($_REQUEST["pagg"] == 1) {
         }
 
 
-
         echo "HAY CITAS";
-    }else{
+    } else {
         echo "NO HAY CITAS";
-        $array_horario_primera_vez = array(
-            "10:00", "10:15", "10:30", "10:45",
-            "11:00", "11:15", "10:30", "10:45",
-            "12:00", "12:15", "12:30", "12:45",
-            "13:00", "13:15", "13:30", "13:45",
-            "14:00", "14:15", "14:30", "14:45",
-            "15:00", "15:15", "15:30", "15:45",
-            "16:00", "16:15", "16:30", "16:45",
-            "17:00", "17:15", "17:30", "17:45",
-            "18:00", "18:15", "18:30", "18:45",
-            "19:00", "19:15", "19:30", "19:45",
-            "20:00", "20:15", "20:30", "20:45",
-            "21:00", "21:15", "21:30", "21:45",
-
-
-        );
 
 
         echo "<div id='diaSeleccionado'></div>";
@@ -327,11 +409,7 @@ if ($_REQUEST["pagg"] == 1) {
     print_r($array_reservas_duracion);
 
 
-
-
-
-}
-elseif ($_REQUEST["pagg"] == 3) {
+} elseif ($_REQUEST["pagg"] == 3) {
 
     $nombre = $_REQUEST["nombre"];
 
@@ -350,12 +428,9 @@ elseif ($_REQUEST["pagg"] == 3) {
     $servicio = $_REQUEST["servicio"];
 
 
-
     $nombre_check = true;
     $correo_check = true;
     $telefono_check = true;
-
-
 
 
     //////////////////////////////////////////////////////////////////////
@@ -385,11 +460,6 @@ elseif ($_REQUEST["pagg"] == 3) {
     }
 
 
-
-
-
-
-
     //////////////////////////////////////////////////////////////////////
     ////////////COMPRUEBO SI LOS DATOS INTRODUCIDOS COINCIDEN/////////////
     //////////////////////////////////////////////////////////////////////
@@ -398,30 +468,28 @@ elseif ($_REQUEST["pagg"] == 3) {
     if ($contador1 != 0) {
         while ($row = mysqli_fetch_array($resultado)) {
 
-            if($nombre != $row[0]){
+            if ($nombre != $row[0]) {
                 $nombre_check = false;
             }
 
-            if($correo != $row[1]){
+            if ($correo != $row[1]) {
                 $correo_check = false;
             }
         }
-    }else{
+    } else {
         $nombre_check = false;
         $correo_check = false;
         $telefono_check = false;
     }
 
 
-
     //si todos los datos son nuevos para el servidor INSERTAMOS EL NUEVO USUARIO
-    if($nombre_check == false && $telefono_check == false && $correo_check == false){
+    if ($nombre_check == false && $telefono_check == false && $correo_check == false) {
         echo "asd";
 
         $insertar = "INSERT INTO clientes (nombreCliente, telefonoCliente, correoCliente) VALUES ('$nombre', '$telefono', '$correo')";
         $conexion->query($insertar);
         echo "Se ha añadido el cliente <b>" . $nombre . "</b> con exito!<br><br>";
-
 
 
         $idCliente = "";
@@ -441,36 +509,23 @@ elseif ($_REQUEST["pagg"] == 3) {
         echo "HAS AÑADIDO LA NUEVA CITA";
 
 
-
-
-
-    }else{
+    } else {
         //correo mal escrito
-        if($nombre_check == true && $correo_check == false){
+        if ($nombre_check == true && $correo_check == false) {
             echo "Su telefono: " . $telefono . " ya esta asociado con otro correo electronico.<br><br>Presione <b>Actualizar</b> si desea actualizar el correo electronico, o presiones </b>Cancelar</b> para editar los datos ingresados";
             //nombre mal escrito
-        }else if($nombre_check == false && $correo_check == false){
+        } else if ($nombre_check == false && $correo_check == false) {
             echo "Su telefono: " . $telefono . " ya esta asociado con otro nombre y correo electronico.<br><br>Presione <b>Actualizar</b> si desea actualizar su nombre y correo electronico, o presiones <b>Cancelar</b> para editar los datos ingresados";
             //nombre y correo mal escritos
-        }else if($nombre_check == false && $correo_check == true) {
+        } else if ($nombre_check == false && $correo_check == true) {
             echo "Su telefono: " . $telefono . " ya esta asociado con otro nombre.<br><br>Presione <b>Actualizar</b> si desea actualizar su nombre, o presiones <b>Cancelar</b> para editar los datos ingresados";
         }
     }
 
 
-
-
-
-
-
-
-
-
-
 } else {
 
 }
-
 
 
 ?>
