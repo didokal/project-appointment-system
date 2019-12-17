@@ -364,31 +364,31 @@ if ($_REQUEST["pagg"] == 1) {
         $siguiente_indice = 0;
         $first_time = true;
 
-/*
-        for ($x = 0; $x < count($array_horario); $x++) {
+        /*
+                for ($x = 0; $x < count($array_horario); $x++) {
 
-            if($first_time == true){
-                if (array_key_exists($x, $array_horario_horas_libres)) {
-                    echo $x . " = $array_horario_horas_libres[$x]<br>";
-                    $indice_con_un_paso_adelante = $x+1;
-                    echo "<br><br>";
-                    $first_time = false;
+                    if($first_time == true){
+                        if (array_key_exists($x, $array_horario_horas_libres)) {
+                            echo $x . " = $array_horario_horas_libres[$x]<br>";
+                            $indice_con_un_paso_adelante = $x+1;
+                            echo "<br><br>";
+                            $first_time = false;
+                        }
+                    }else{
+                        if($indice_con_un_paso_adelante == $x){
+                            echo "$x BIEN<br>";
+                        }else{
+                            echo "$x BORRAR<br>";
+                        }
+
+
+
+                    }
+
                 }
-            }else{
-                if($indice_con_un_paso_adelante == $x){
-                    echo "$x BIEN<br>";
-                }else{
-                    echo "$x BORRAR<br>";
-                }
 
 
-
-            }
-
-        }
-
-
-*/
+        */
         //aqui envitamos que se muestren aquellas casillas solitarias que hay en el horario, ejemplo
         //si en el horario de casillas libres nos encontramos de repente una casilla solitaria con la cual no se puede hacer una grupo de casillas como puede ser
         // un ejemplo (10:00, 10:15, 10:30), aqui tenemos un grupo de tres casillas libres, pero si nos entonctramos (10:00, 10:15, 10:30, 11:00, 12:00, 12:15),
