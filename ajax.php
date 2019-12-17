@@ -44,7 +44,7 @@ function intervaloHora_alreves($hora_fin, $hora_inicio, $intervalo = 15)
     // Establecemos el intervalo en minutos
     $intervalo = new DateInterval('PT' . $intervalo . 'M');
 
-    // Sacamos los periodos entre las horas
+    // Sacamos los periodos entres las horas
     $periodo = new DatePeriod($hora_inicio, $intervalo, $hora_fin);
 
     foreach ($periodo as $hora) {
