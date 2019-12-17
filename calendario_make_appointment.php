@@ -11,17 +11,12 @@
 
 
     function dosomething(dia){
-
         var mes = document.getElementById("month").innerHTML;
         var anio = document.getElementById("year").innerHTML;
 
         console.log(mes);
         console.log(anio);
         console.log(dia);
-
-
-
-
 
         var mes_numero = 0;
         var mes_en_ingles = "";
@@ -65,11 +60,7 @@
 
         document.cookie = "fecha=" + anio + "-" + mes_numero + "-" + dia;
         document.cookie = "diaSemana=" + diaSemana(dia, mes_en_ingles, anio);
-
     }
-
-    onc
-
 </script>
 
 
@@ -217,7 +208,7 @@ $aKeys = array(
     '__cal_caption2__' => $iYear,
     '__cal_rows__' => $sCalTblRows,
 );
-$sCalendarItself = strtr(file_get_contents('calendario/calendar.html'), $aKeys);
+$sCalendarItself = strtr(file_get_contents('calendar_make_appointment/calendar.html'), $aKeys);
 // AJAX requests - return the calendar
 if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest' && isset($_GET['month'])) {
     header('Content-Type: text/html; charset=utf-8');
@@ -228,6 +219,6 @@ $aVariables = array(
     '__calendar__' => $sCalendarItself,
 );
 
-echo strtr(file_get_contents('calendario/index.html'), $aVariables);
+echo strtr(file_get_contents('calendar_make_appointment/index.html'), $aVariables);
 
 

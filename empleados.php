@@ -2,7 +2,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
 <h1>Menu</h1>
@@ -12,6 +12,9 @@
     <li><a href="empleados.php">Empleados</a></li>
     <li><a href="categorias.php">Categorias</a></li>
     <li><a href="servicios.php">Servicios</a></li>
+    <li><a href="calendario_show_appointments.html">Calendario con citas</a></li>
+    <li><a href="clientes.php">Clientes</a></li>
+    <li><a href="citas.php">Citas</a></li>
 </ul>
 <hr style="color: #0056b2"/>
 <br><br><br>
@@ -89,8 +92,11 @@
             <div id="menu_actualizar_empleado">
                 <ul>
                     <li id="datos_emple" class="datos_emple" onclick="abrir_datos_emple()">Datos empleado</li>
-                    <li id="servicios_emple" class="servicios_emple" onclick="abrir_servicios_emple()">Servicios empleado</li>
-                    <li id="horarios_emple" class="horarios_emple" onclick="abrir_horarios_emple()">Horario empleado</li>
+                    <li id="servicios_emple" class="servicios_emple" onclick="abrir_servicios_emple()">Servicios
+                        empleado
+                    </li>
+                    <li id="horarios_emple" class="horarios_emple" onclick="abrir_horarios_emple()">Horario empleado
+                    </li>
                 </ul>
             </div>
             <span id="popUp_editar_emple_datos_info"></span>
@@ -110,8 +116,11 @@
             <div id="menu_actualizar_empleado">
                 <ul>
                     <li id="datos_emple" class="datos_emple" onclick="abrir_datos_emple()">Datos empleado</li>
-                    <li id="servicios_emple" class="servicios_emple" onclick="abrir_servicios_emple()">Servicios empleado</li>
-                    <li id="horarios_emple" class="horarios_emple" onclick="abrir_horarios_emple()">Horario empleado</li>
+                    <li id="servicios_emple" class="servicios_emple" onclick="abrir_servicios_emple()">Servicios
+                        empleado
+                    </li>
+                    <li id="horarios_emple2" class="horarios_emple" onclick="abrir_horarios_emple()">Horario empleado
+                    </li>
                 </ul>
             </div>
             <span id="popUp_editar_emple_servicios_info"></span>
@@ -131,8 +140,11 @@
             <div id="menu_actualizar_empleado">
                 <ul>
                     <li id="datos_emple" class="datos_emple" onclick="abrir_datos_emple()">Datos empleado</li>
-                    <li id="servicios_emple" class="servicios_emple" onclick="abrir_servicios_emple()">Servicios empleado</li>
-                    <li id="horarios_emple" class="horarios_emple" onclick="abrir_horarios_emple()">Horario empleado</li>
+                    <li id="servicios_emple2" class="servicios_emple" onclick="abrir_servicios_emple()">Servicios
+                        empleado
+                    </li>
+                    <li id="horarios_emple" class="horarios_emple" onclick="abrir_horarios_emple()">Horario empleado
+                    </li>
                 </ul>
             </div>
             <span id="popUp_editar_emple_horarios_info"></span>
@@ -144,10 +156,63 @@
     </div>
 
 
+    <div id="miAlerta" class="alerta">
+        <div class="alerta-content">
+
+            <span id="alert-text3"></span>
+            <div id="alert-footer">
+                <span id="alert_actualizar" onclick="alert_back()">Volver y corregir los datos introducidos</span>
+                <span id="alert_cancelar" onclick="alert_cancel()">Cancelar</span>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="miAlerta2" class="alerta">
+        <div class="alerta-content">
+
+            <span id="alert-text4"></span>
+            <div id="alert-footer">
+                <span id="alert_ok" onclick="alert_ok()">OK</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="miAlerta3" class="alerta">
+        <div class="alerta-content">
+
+            <span id="alert-text5"></span>
+            <div id="alert-footer">
+                <span id="alert_actualizar" onclick="alert_back2()">Volver y corregir los datos introducidos</span>
+                <span id="alert_cancelar" onclick="alert_cancel()">Cancelar</span>
+            </div>
+        </div>
+    </div>
+
+
     <script>
         var datos = "";
         var empleados_para_borrar = [];
         var id_empleado = "";
+
+
+        function alert_cancel() {
+            document.getElementById("miAlerta").style.display = "none";
+        }
+
+        function alert_ok() {
+            document.getElementById("miAlerta2").style.display = "none";
+        }
+
+        function alert_back() {
+            document.getElementById("miAlerta").style.display = "none";
+            document.getElementById("popUp_anadir_emple").style.display = "block";
+        }
+
+        function alert_back2() {
+            document.getElementById("miAlerta3").style.display = "none";
+            document.getElementById("popUp_editar_emple_datos").style.display = "block";
+        }
 
 
         document.getElementById("buton_anadir_emple").addEventListener("click", function () {
@@ -191,8 +256,18 @@
                     if (this.readyState == 4 && this.status == 200) {
                         console.log(this.responseText);
                         document.getElementById("popUp_anadir_emple").style.display = "none";
-                        document.getElementById("tabla").innerHTML = '';
-                        document.getElementById("tabla").innerHTML = this.responseText;
+
+                        if (this.responseText.includes("ERROR")) {
+                            document.getElementById("alert-text3").innerHTML = this.responseText;
+                            //mostramos la alerta
+                            document.getElementById("miAlerta").style.display = "block";
+                        } else {
+                            document.getElementById("tabla").innerHTML = '';
+                            document.getElementById("tabla").innerHTML = this.responseText;
+
+                            document.getElementById("alert-text4").innerHTML = "El empleado ha sido creado satisfactoriamente!";
+                            document.getElementById("miAlerta2").style.display = "block";
+                        }
                     }
                 };
                 xhttp.open("POST", "ajax2.php?motivo=anadir_empleado" + "&nombre=" + nombre + "&telefono=" + telefono + "&correo=" + correo);
@@ -213,21 +288,24 @@
 
                 datos += cb.value + ",";
             });
+            if (empleados_para_borrar.length > 0) {
+                var xhttp = new XMLHttpRequest();
+                xhttp.onreadystatechange = function () {
+                    if (this.readyState == 4 && this.status == 200) {
+                        console.log(this.responseText);
+                        console.log(empleados_para_borrar);
 
-            var xhttp = new XMLHttpRequest();
-            xhttp.onreadystatechange = function () {
-                if (this.readyState == 4 && this.status == 200) {
-                    console.log(this.responseText);
-                    console.log(empleados_para_borrar);
-
-                    //eliminamos los divs con los empleados seleccionados
-                    for (var x = 0; x < empleados_para_borrar.length; x++) {
-                        document.getElementById(empleados_para_borrar[x]).innerHTML = '';
+                        //eliminamos los divs con los empleados seleccionados
+                        for (var x = 0; x < empleados_para_borrar.length; x++) {
+                            document.getElementById(empleados_para_borrar[x]).innerHTML = '';
+                        }
+                        document.getElementById("alert-text4").innerHTML = "La operación ha sido realizada con exito!";
+                        document.getElementById("miAlerta2").style.display = "block";
                     }
-                }
-            };
-            xhttp.open("POST", "ajax2.php?motivo=eliminar_empleado" + "&empleados=" + datos);
-            xhttp.send();
+                };
+                xhttp.open("POST", "ajax2.php?motivo=eliminar_empleado" + "&empleados=" + datos);
+                xhttp.send();
+            }
         });
 
 
@@ -269,10 +347,19 @@
             var xhttp2 = new XMLHttpRequest();
             xhttp2.onreadystatechange = function () {
                 if (this.readyState == 4 && this.status == 200) {
-                    console.log(this.responseText);
+                    document.getElementById("popUp_editar_emple_datos").style.display = "none";
 
-                    document.getElementById("tabla").innerHTML = '';
-                    document.getElementById("tabla").innerHTML = this.responseText;
+                    if (this.responseText.includes("ERROR")) {
+                        document.getElementById("alert-text5").innerHTML = this.responseText;
+                        //mostramos la alerta
+                        document.getElementById("miAlerta3").style.display = "block";
+                    } else {
+                        document.getElementById("tabla").innerHTML = '';
+                        document.getElementById("tabla").innerHTML = this.responseText;
+
+                        document.getElementById("alert-text4").innerHTML = "Los datos del empleado han sido actializados satisfactoriamente!";
+                        document.getElementById("miAlerta2").style.display = "block";
+                    }
                 }
             };
             xhttp2.open("POST", "ajax2.php?motivo=actualizar_empleado" + "&nombre_empleado=" + nombre_empleado + "&telefono_empleado=" + telefono_empleado + "&correo_empleado=" + correo_empleado + "&idEmpleado=" + id_empleado);
@@ -282,8 +369,7 @@
 
         document.getElementById("servicios_emple").addEventListener("click", function () {
 
-            document.getElementById("popUp_editar_emple_horarios_info").style.display = "block";
-            document.getElementById("popUp_editar_emple_datos").style.display = "none";
+            document.getElementById("popUp_editar_emple_servicios").style.display = "block";
 
             var xhttp2 = new XMLHttpRequest();
             xhttp2.onreadystatechange = function () {
@@ -294,7 +380,22 @@
             };
             xhttp2.open("POST", "ajax2.php?motivo=mostrar_servicios2" + "&idEmpleado=" + id_empleado);
             xhttp2.send();
+        });
 
+
+        document.getElementById("servicios_emple2").addEventListener("click", function () {
+
+            document.getElementById("popUp_editar_emple_servicios").style.display = "block";
+
+            var xhttp2 = new XMLHttpRequest();
+            xhttp2.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    console.log(this.responseText);
+                    document.getElementById("popUp_editar_emple_servicios_info").innerHTML = this.responseText;
+                }
+            };
+            xhttp2.open("POST", "ajax2.php?motivo=mostrar_servicios2" + "&idEmpleado=" + id_empleado);
+            xhttp2.send();
         });
 
 
@@ -309,7 +410,6 @@
                     console.log(inputElements[i].value);
 
                     var nombre_servicio = inputElements[i].value;
-
 
                     var precio = document.getElementById("precio_" + nombre_servicio).value;
 
@@ -329,13 +429,13 @@
             xhttp2.onreadystatechange = function () {
                 if (this.readyState == 4 && this.status == 200) {
                     console.log(this.responseText);
-                    //document.getElementById("popUp_editar_emple_servicios_info").innerHTML = this.responseText;
+                    document.getElementById("popUp_editar_emple_servicios").style.display = "none";
+                    document.getElementById("alert-text4").innerHTML = "Los servicios del empleado han sido actializados satisfactoriamente!";
+                    document.getElementById("miAlerta2").style.display = "block";
                 }
             };
             xhttp2.open("POST", "ajax2.php?motivo=actualizar_servicios_asignados_emple" + "&array_servicios_asignados_nombre=" + array_servicios_asignados_nombre + "&array_servicios_asignados_precio=" + array_servicios_asignados_precio + "&idEmpleado=" + id_empleado);
             xhttp2.send();
-
-
         });
 
 
@@ -351,10 +451,23 @@
             };
             xhttp2.open("POST", "ajax2.php?motivo=mostrar_horarios" + "&idEmpleado=" + id_empleado);
             xhttp2.send();
-
         });
 
 
+        //he tenido que dublicar porque al tener dos IDs iguales, al hacer click por segunda vez en el mismo Id pero en el otro sitio ya no reaccionaba
+        document.getElementById("horarios_emple2").addEventListener("click", function () {
+            document.getElementById("popUp_editar_emple_horarios_info").style.display = "block";
+
+            var xhttp2 = new XMLHttpRequest();
+            xhttp2.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    console.log(this.responseText);
+                    document.getElementById("popUp_editar_emple_horarios_info").innerHTML = this.responseText;
+                }
+            };
+            xhttp2.open("POST", "ajax2.php?motivo=mostrar_horarios" + "&idEmpleado=" + id_empleado);
+            xhttp2.send();
+        });
 
 
         document.getElementById("buton_actualizar_emple_interno_horarios").addEventListener("click", function () {
@@ -399,18 +512,16 @@
             //console.log(array_horarios_fin);
 
 
-
             var xhttp2 = new XMLHttpRequest();
             xhttp2.onreadystatechange = function () {
                 if (this.readyState == 4 && this.status == 200) {
-                    //console.log(this.responseText);
-
+                    document.getElementById("popUp_editar_emple_horarios").style.display = "none";
+                    document.getElementById("alert-text4").innerHTML = "Los horarios del empleado han sido actializados satisfactoriamente!";
+                    document.getElementById("miAlerta2").style.display = "block";
                 }
             };
             xhttp2.open("POST", "ajax2.php?motivo=anadir_horarios" + "&idEmpleado=" + id_empleado + "&array_horarios_start=" + array_horarios_start + "&array_horarios_fin=" + array_horarios_fin);
             xhttp2.send();
-
-
         });
 
 
@@ -434,9 +545,10 @@
 
 
         function abrir_servicios_emple() {
-            document.getElementById("popUp_editar_emple_servicios").style.display = "block";
+
             document.getElementById("popUp_editar_emple_datos").style.display = "none";
             document.getElementById("popUp_editar_emple_horarios").style.display = "none";
+            document.getElementById("popUp_editar_emple_servicios").style.display = "block";
 
             document.getElementsByClassName("servicios_emple")[0].classList.add("active");
             document.getElementsByClassName("servicios_emple")[1].classList.add("active");
@@ -446,19 +558,16 @@
             document.getElementsByClassName("datos_emple")[1].classList.remove("active");
             document.getElementsByClassName("datos_emple")[2].classList.remove("active");
 
-
             document.getElementsByClassName("horarios_emple")[0].classList.remove("active");
             document.getElementsByClassName("horarios_emple")[1].classList.remove("active");
             document.getElementsByClassName("horarios_emple")[2].classList.remove("active");
-
-
         }
 
 
         function abrir_horarios_emple() {
-            document.getElementById("popUp_editar_emple_horarios").style.display = "block";
             document.getElementById("popUp_editar_emple_servicios").style.display = "none";
             document.getElementById("popUp_editar_emple_datos").style.display = "none";
+            document.getElementById("popUp_editar_emple_horarios").style.display = "block";
 
             document.getElementsByClassName("horarios_emple")[0].classList.add("active");
             document.getElementsByClassName("horarios_emple")[1].classList.add("active");
@@ -472,8 +581,6 @@
             document.getElementsByClassName("datos_emple")[1].classList.remove("active");
             document.getElementsByClassName("datos_emple")[2].classList.remove("active");
         }
-
-
     </script>
 </div>
 </body>

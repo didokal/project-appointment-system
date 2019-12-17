@@ -30,7 +30,7 @@ $contar_servicios_asignar_num_correspondiente_precio = array();
             border: 0
         }
     </style>
-
+    <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
 <h1>Menu</h1>
@@ -40,6 +40,9 @@ $contar_servicios_asignar_num_correspondiente_precio = array();
     <li><a href="empleados.php">Empleados</a></li>
     <li><a href="categorias.php">Categorias</a></li>
     <li><a href="servicios.php">Servicios</a></li>
+    <li><a href="calendario_show_appointments.html">Calendario con citas</a></li>
+    <li><a href="clientes.php">Clientes</a></li>
+    <li><a href="citas.php">Citas</a></li>
 </ul>
 <hr style="color: #0056b2" />
 <br><br><br>

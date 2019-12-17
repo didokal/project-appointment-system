@@ -25,7 +25,7 @@
     text-align: center;
 }
 #calendar .navigation .prev, #calendar .navigation .next {
-    background-image: url(./images/nav.png);
+    background-image: url(../design/nav.png);
     height: 24px;
     opacity: 0.9;
     position: absolute;

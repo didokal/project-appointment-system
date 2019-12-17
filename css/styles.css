@@ -414,8 +414,7 @@ ul .no_active{
     cursor: pointer;
     border-radius: 4px;
     color: #fff;
-    text-transform: capitalize;
-    background-color: #a31e50 !important;
+    background-color: #3e8ef7 !important;
 }
 
 #alert_actualizar2, #alert_anadir, #alert-actualizar-datos-personales, #alert-actualizar-servicios , #buton_anadir_emple_interno, #buton_actualizar_emple_interno_datos,
@@ -425,6 +424,23 @@ ul .no_active{
     border: 0;
     margin-bottom: 0;
     margin-right: 20px;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.42857143;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    cursor: pointer;
+    border-radius: 4px;
+    color: #fff;
+    background-color: #3e8ef7 !important;
+}
+
+#alert_ok{
+    display: inline-block;
+    padding: 6px 12px !important;
+    border: 0;
+    margin-bottom: 0;
     font-size: 14px;
     font-weight: 400;
     line-height: 1.42857143;

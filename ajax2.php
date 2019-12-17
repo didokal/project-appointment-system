@@ -40,10 +40,13 @@ if ($_REQUEST["motivo"] == "eliminar_empleado") {
     $telefono = $_REQUEST["telefono"];
     $correo = $_REQUEST["correo"];
 
-    $query = mysqli_query($conexion, "SELECT * FROM empleados WHERE nombreEmpleado = '$nombre' AND telefonoEmpleado = $telefono AND emailEmpleado = '$correo'");
-    $contador = mysqli_num_rows($query);                                                //lo que devuelve la select lo guardamos en la variable contador,
+    $query = mysqli_query($conexion, "SELECT nombreEmpleado FROM empleados WHERE telefonoEmpleado = $telefono");
+    $check_telefono = mysqli_num_rows($query);
 
-    if ($contador == 0) {
+    $query = mysqli_query($conexion, "SELECT nombreEmpleado FROM empleados WHERE emailEmpleado = '$correo'");
+    $check_correo = mysqli_num_rows($query);
+
+    if ($check_telefono == 0 && $check_correo == 0) {
         $insertar = "INSERT INTO empleados (nombreEmpleado, telefonoEmpleado, emailEmpleado) VALUES ('$nombre', '$telefono', '$correo')";     //le pasamas el insert a la variable inset
         $conexion->query($insertar);
         if ($insertar) {
@@ -61,16 +64,12 @@ if ($_REQUEST["motivo"] == "eliminar_empleado") {
             }
 
         } else {
-            echo "ERROR al intentar insertar el empleado en la tabla!";
+            echo "ERROR al intentar insertar el empleado en la BD!";
         }
-
-    } //SI EL USUARIO EXISTE
-    else {
-        echo "ERROR: El servicio con nombre <b>" . $nombre . "</b> ya existe!";
-
+    } else {
+        echo "ERROR: El telefono o/y correo electronico que has introducido ya estan asociados a otro empleado!";
         mysqli_close($conexion);
     }
-
 } else if ($_REQUEST["motivo"] == "editar_empleado") {
 
 
@@ -116,21 +115,36 @@ if ($_REQUEST["motivo"] == "eliminar_empleado") {
         $telefono_empleado = $_REQUEST["telefono_empleado"];
         $correo_empleado = $_REQUEST["correo_empleado"];
 
-        mysqli_query($conexion, "UPDATE `empleados` SET `nombreEmpleado` = '$nombre_empleado', `telefonoEmpleado` = '$telefono_empleado', `emailEmpleado` = '$correo_empleado' WHERE `idEmpleado` = $idEmpleado");
+
+        $query = mysqli_query($conexion, "SELECT nombreEmpleado FROM empleados WHERE telefonoEmpleado = $telefono_empleado AND idEmpleado != $idEmpleado");
+        $check_telefono = mysqli_num_rows($query);
+
+        $query2 = mysqli_query($conexion, "SELECT nombreEmpleado FROM empleados WHERE emailEmpleado = '$correo_empleado' AND idEmpleado != $idEmpleado");
+        $check_correo = mysqli_num_rows($query2);
+
+        if ($check_telefono == 0 && $check_correo == 0) {
+            mysqli_query($conexion, "UPDATE `empleados` SET `nombreEmpleado` = '$nombre_empleado', `telefonoEmpleado` = '$telefono_empleado', `emailEmpleado` = '$correo_empleado' WHERE `idEmpleado` = $idEmpleado");
 
 
-        echo "<tr><th>Nombre</th><th>Telefono</th><th>Correo electronico</th><th></th><th></th></tr>";
+            echo "<tr><th>Nombre</th><th>Telefono</th><th>Correo electronico</th><th></th><th></th></tr>";
 
-        $resultado = mysqli_query($conexion, "SELECT * FROM `empleados`");
-        while ($row = mysqli_fetch_array($resultado)) {
-            echo "<tr class='trr' id='emple$row[0]'>";
-            echo "<td>$row[1]</td>";
-            echo "<td>$row[2]</td>";
-            echo "<td>$row[3]</td>";
-            echo "<td><button type='button' id='buton_tabla' onclick='editar_servicio(\"$row[0]\")'><i class='button_imagen'></td>";
-            echo "<td><input type='checkbox' id='checkbox_borrar'  name='location[]' value='$row[0]'></td>";
-            echo "</tr>";
+            $resultado = mysqli_query($conexion, "SELECT * FROM `empleados`");
+            while ($row = mysqli_fetch_array($resultado)) {
+                echo "<tr class='trr' id='emple$row[0]'>";
+                echo "<td>$row[1]</td>";
+                echo "<td>$row[2]</td>";
+                echo "<td>$row[3]</td>";
+                echo "<td><button type='button' id='buton_tabla' onclick='editar_servicio(\"$row[0]\")'><i class='button_imagen'></td>";
+                echo "<td><input type='checkbox' id='checkbox_borrar'  name='location[]' value='$row[0]'></td>";
+                echo "</tr>";
+            }
+
+        } else {
+            echo "ERROR: El telefono o/y correo electronico que has introducido ya estan asociados a otro empleado!";
+            mysqli_close($conexion);
         }
+
+
     }
 } else if ($_REQUEST["motivo"] == "eliminar_categoria") {
     echo "categoria";
@@ -168,10 +182,7 @@ if ($_REQUEST["motivo"] == "eliminar_empleado") {
 
 
 } else if ($_REQUEST["motivo"] == "anadir_categoria") {
-    echo "anadir categoria";
-
     if (isset($_REQUEST["categoria"])) {
-        echo $_REQUEST["categoria"];
         $categoria = $_REQUEST["categoria"];
 
 
@@ -241,12 +252,6 @@ if ($_REQUEST["motivo"] == "eliminar_empleado") {
         $duracion = $_REQUEST["duracion"];
         $categoria = $_REQUEST["categoria"];
 
-        echo $servicio;
-        echo $duracion;
-        echo $categoria;
-        echo "<br><br>";
-
-
         $query = mysqli_query($conexion, "SELECT * FROM servicios WHERE nombreServ = '$servicio'");
         $contador = mysqli_num_rows($query);                                                //lo que devuelve la select lo guardamos en la variable contador,
         //en nuestro caso devolver un 0 si no existe el usuarios y 1 si existe
@@ -254,7 +259,6 @@ if ($_REQUEST["motivo"] == "eliminar_empleado") {
         //sacamos el ID de la categoria para pasarsela al insert a la hora de ejecutar la SQL
         $query2 = mysqli_query($conexion, "SELECT idCategory FROM categorias WHERE nameCat = '$categoria'");
         $row = mysqli_fetch_assoc($query2);
-        echo "<h1>" . $row['idCategory'] . "</h1>";
         $id_category = $row['idCategory'];
 
         //SI EL USUARIO NO EXISTE
@@ -305,10 +309,8 @@ if ($_REQUEST["motivo"] == "eliminar_empleado") {
 
 
         $query = mysqli_query($conexion, "SELECT * FROM servicios WHERE idServicio = '$servicio'");
-        $contador = mysqli_num_rows($query);                                                //lo que devuelve la select lo guardamos en la variable contador,
-        //en nuestro caso devolver un 0 si no existe el usuarios y 1 si existe
+        $contador = mysqli_num_rows($query);
 
-        //SI EL USUARIO NO EXISTE
         if ($contador == 1) {
 
 
@@ -360,25 +362,33 @@ if ($_REQUEST["motivo"] == "eliminar_empleado") {
         $id_category = $row['idCategory'];
 
 
-        mysqli_query($conexion, "UPDATE `servicios` SET `nombreServ` = '$nombre_serv', `duracionServ` = '$duracion_serv', `idCategoria` = '$id_category' WHERE `idServicio` = $idServicio");
+        $query = mysqli_query($conexion, "SELECT idServicio FROM servicios WHERE nombreServ = '$nombre_serv' AND idServicio != $idServicio");
+        $contador = mysqli_num_rows($query);
 
+        if ($contador == 0) {
+            mysqli_query($conexion, "UPDATE `servicios` SET `nombreServ` = '$nombre_serv', `duracionServ` = '$duracion_serv', `idCategoria` = '$id_category' WHERE `idServicio` = $idServicio");
 
-        echo "<tr><th>Nombre</th><th>Duracion</th><th>Categoria</th><th></th><th></th></tr>";
+            echo "<tr><th>Nombre</th><th>Duracion</th><th>Categoria</th><th></th><th></th></tr>";
 
-        $resultado = mysqli_query($conexion, "SELECT * FROM `servicios`");
-        while ($row = mysqli_fetch_array($resultado)) {
-            echo "<tr class='trr' id='serv$row[1]'>";
-            echo "<td>$row[1]</td>";
-            echo "<td>$row[2]</td>";
+            $resultado = mysqli_query($conexion, "SELECT * FROM `servicios`");
+            while ($row = mysqli_fetch_array($resultado)) {
+                echo "<tr class='trr' id='serv$row[1]'>";
+                echo "<td>$row[1]</td>";
+                echo "<td>$row[2]</td>";
 
-            $query2 = mysqli_query($conexion, "SELECT nameCat FROM categorias WHERE idCategory = '$row[3]'");
-            $row2 = mysqli_fetch_assoc($query2);
-            $id_category = $row2['nameCat'];
-            echo "<td>$id_category</td>";
+                $query2 = mysqli_query($conexion, "SELECT nameCat FROM categorias WHERE idCategory = '$row[3]'");
+                $row2 = mysqli_fetch_assoc($query2);
+                $id_category = $row2['nameCat'];
+                echo "<td>$id_category</td>";
 
-            echo "<td><button type='button' id='buton_tabla' onclick='editar_servicio(\"$row[0]\")'><i class='button_imagen'></td>";
-            echo "<td><input type='checkbox' id='checkbox_borrar'  name='location[]' value='$row[1]'></td>";
-            echo "</tr>";
+                echo "<td><button type='button' id='buton_tabla' onclick='editar_servicio(\"$row[0]\")'><i class='button_imagen'></td>";
+                echo "<td><input type='checkbox' id='checkbox_borrar'  name='location[]' value='$row[1]'></td>";
+                echo "</tr>";
+            }
+
+        } else {
+            echo "ERROR: El servicio con nombre <b>" . $nombre_serv . "</b> ya existe!";
+            mysqli_close($conexion);
         }
     }
 } else if ($_REQUEST["motivo"] == "mostrar_servicios2") {
@@ -515,7 +525,7 @@ if ($_REQUEST["motivo"] == "eliminar_empleado") {
 
                 echo "<span style=\"width:100px; display:inline-block\">";
                 echo "<select style='width: 80px; display: inline-block' id='fin_$array_dias_semana[$y]'>";
-                for ($x = count($array_horario_primera_vez)-1 ; $x >=0 ; $x--) {
+                for ($x = count($array_horario_primera_vez) - 1; $x >= 0; $x--) {
                     echo "<option value='$array_horario_primera_vez[$x]'>$array_horario_primera_vez[$x]</option>";
                 }
                 echo "</select>";
@@ -547,7 +557,7 @@ if ($_REQUEST["motivo"] == "eliminar_empleado") {
 
                         echo "<span style=\"width:100px; display:inline-block\">";
                         echo "<select style='width: 80px; display: inline-block' id='fin_$array_dias_semana[$y]'>";
-                        for ($x = count($array_horario_primera_vez)-1 ; $x >=0 ; $x--) {
+                        for ($x = count($array_horario_primera_vez) - 1; $x >= 0; $x--) {
                             if ($array_horario_primera_vez[$x] == $datos[1]) {
                                 echo "<option value='$array_horario_primera_vez[$x]' selected>$array_horario_primera_vez[$x]</option>";
                             } else {
@@ -630,6 +640,396 @@ if ($_REQUEST["motivo"] == "eliminar_empleado") {
                 //echo "$d = $dia = update => $array_horarios_start_convertido[$d]<br>";
                 mysqli_query($conexion, "UPDATE `horario_semanal` SET `horaStart` = '$array_horarios_start_convertido[$d]', `horaFin` = '$array_horarios_fin_convertido[$d]' WHERE `idEmple` = '$idEmpleado' AND `diaSemana` = '$dia'");
             }
+        }
+    }
+} else if ($_REQUEST["motivo"] == "eliminar_cliente") {
+    if (isset($_REQUEST["clientes"]) && $_REQUEST["clientes"] != "") {
+        $clientes = json_decode($_REQUEST["clientes"]);
+        echo "ESTOS SON LOS CLIENTES QUE HAY QUE BORRAR ==>>>  ";
+
+        echo count($clientes) . "<br>";
+        print_r($clientes);
+
+        for ($x = 0; $x < count($clientes); $x++) {
+            $id = $clientes[$x][0];
+            $tel = $clientes[$x][1];
+            mysqli_query($conexion, "DELETE FROM `clientes` WHERE `idCliente` = '$id' AND `telefonoCliente` = '$tel'");
+        }
+
+
+    }
+} else if ($_REQUEST["motivo"] == "editar_cliente") {
+
+
+    if (isset($_REQUEST["cliente"])) {
+        $cliente = $_REQUEST["cliente"];
+
+
+        $query = mysqli_query($conexion, "SELECT * FROM clientes WHERE idCliente = '$cliente'");
+        $contador = mysqli_num_rows($query);                                                //lo que devuelve la select lo guardamos en la variable contador,
+        //en nuestro caso devolver un 0 si no existe el usuarios y 1 si existe
+
+        //SI EL USUARIO NO EXISTE
+        if ($contador == 1) {
+
+
+            while ($row = mysqli_fetch_array($query)) {
+                echo "Nombre cliente:<br><br>";
+                echo "<input type='text' id='nombre_cliente2' value='$row[1]'><br><br>";
+
+                echo "Telefono:<br><br>";
+                echo "<input type='number' id='telefono_cliente2' value='$row[2]'><br><br>";
+
+                echo "Correo electronico:<br><br>";
+                echo "<input type='text' id='correo_electronico_cliente2' value='$row[3]'>";
+            }
+
+        }
+    }
+} else if ($_REQUEST["motivo"] == "actualizar_cliente") {
+
+    if (empty($_REQUEST["nombre_cliente"]) && empty($_REQUEST("telefono_cliente")) && empty($_REQUEST("correo_electronico"))) {
+        echo "No has mandado todos los datos!";
+    } else {
+
+        $idCliente = $_REQUEST["idCliente"];
+        $nombre_cliente = $_REQUEST["nombre_cliente"];
+        $telefono_cliente = $_REQUEST["telefono_cliente"];
+        $correo_electronico = $_REQUEST["correo_electronico"];
+
+        $query = mysqli_query($conexion, "SELECT idCliente FROM clientes WHERE telefonoCliente = '$telefono_cliente' AND idCliente != $idCliente");
+        $contador = mysqli_num_rows($query);
+
+        if ($contador == 0) {
+            mysqli_query($conexion, "UPDATE `clientes` SET `nombreCliente` = '$nombre_cliente', `telefonoCliente` = '$telefono_cliente', `correoCliente` = '$correo_electronico' WHERE `idCliente` = $idCliente");
+
+
+            echo "<tr><th>Nombre</th><th>Telefono</th><th>Correo electronico</th><th></th><th></th></tr>";
+
+            $resultado = mysqli_query($conexion, "SELECT * FROM `clientes`");
+            while ($row = mysqli_fetch_array($resultado)) {
+                echo "<tr class='trr' id='cliente$row[0]'>";
+                echo "<td>$row[1]</td>";
+                echo "<td>$row[2]</td>";
+                echo "<td>$row[3]</td>";
+
+                echo "<td><button type='button' id='buton_tabla' onclick='editar_servicio(\"$row[0]\")'><i class='button_imagen'></td>";
+                echo "<td><input type='checkbox' id='checkbox_borrar'  name='location[]' value='$row[0]|.|$row[2]'></td>";
+                echo "</tr>";
+            }
+        } else {
+            echo "ERROR: El telefono <b>" . $telefono_cliente . "</b> ya esta asociado a otro cliente!";
+            mysqli_close($conexion);
+        }
+
+
+    }
+} else if ($_REQUEST["motivo"] == "anadir_cliente") {
+    $array_servicios_seleccionados = array();
+
+    if (empty($_REQUEST["nombre"]) && empty($_REQUEST("telefono")) && empty($_REQUEST("correo_electronico"))) {
+        echo "No has mandado todos los datos!";
+    } else {
+        $nombre = $_REQUEST["nombre"];
+        $telefono = $_REQUEST["telefono"];
+        $correo_electronico = $_REQUEST["correo_electronico"];
+        $nombre_check = true;
+        $correo_check = true;
+        $telefono_check = true;
+        /*
+                $resultado2 = mysqli_query($conexion, "SELECT * from clientes WHERE nombreCliente = '$nombre' AND telefonoCliente = '$telefono' AND correoCliente = '$correo_electronico'");
+                $contador2 = mysqli_num_rows($resultado2);
+                if ($contador2 == 0) {
+                    echo "NO EXISTE!";
+                    //INSERTARMOS EL CLIENTE
+                    $insertar_reserva = "INSERT INTO clientes (nombreCliente, telefonoCliente, correoCliente) VALUES ('$nombre', '$telefono', '$correo_electronico')";
+                    $conexion->query($insertar_reserva);
+
+                    echo "HAS AÑADIDO EL NUEVO USUARIO";
+                }
+
+        */
+
+        //////////////////////////////////////////////////////////////////////
+        ////////////COMPRUEBO SI LOS DATOS INTRODUCIDOS COINCIDEN/////////////
+        //////////////////////////////////////////////////////////////////////
+        /// LA VALIDACION se hace con el telefono, si el telefono existe en la BD pero los otros datos que se han metido son distintos a los datos
+        /// que estan asociados al telefono en la BD, me dara alerta diciendo que el nombre y/o coreo estan mal
+        //pero si meto un telefono que no existe en la BD con el mismo correo y nombre que si existen en la BD entonces se creara nuevo usuario
+        $resultado = mysqli_query($conexion, "SELECT nombreCliente, correoCliente from clientes WHERE telefonoCliente = '$telefono'");
+        $contador1 = mysqli_num_rows($resultado);
+        if ($contador1 != 0) {
+            while ($row = mysqli_fetch_array($resultado)) {
+
+                if ($nombre != $row[0]) {
+                    $nombre_check = false;
+                }
+
+                if ($correo_electronico != $row[1]) {
+                    $correo_check = false;
+                }
+            }
+        } else {
+            $nombre_check = false;
+            $correo_check = false;
+            $telefono_check = false;
+        }
+
+
+        //si todos los datos son nuevos para el servidor INSERTAMOS EL NUEVO USUARIO
+        if ($nombre_check == false && $telefono_check == false && $correo_check == false) {
+            echo "asd";
+
+            $insertar = "INSERT INTO clientes (nombreCliente, telefonoCliente, correoCliente) VALUES ('$nombre', '$telefono', '$correo_electronico')";
+            $conexion->query($insertar);
+            echo "Se ha añadido el cliente <b>" . $nombre . "</b> con exito!<br><br>";
+
+        } else {
+            //correo mal escrito
+            if ($nombre_check == true && $correo_check == false) {
+                echo "Su telefono: " . $telefono . " ya esta asociado con otro correo electronico.<br><br>Presione <b>Actualizar</b> si desea actualizar el correo electronico, o presiones </b>Cancelar</b> para editar los datos ingresados";
+                //nombre mal escrito
+            } else if ($nombre_check == false && $correo_check == false) {
+                echo "Su telefono: " . $telefono . " ya esta asociado con otro nombre y correo electronico.<br><br>Presione <b>Actualizar</b> si desea actualizar su nombre y correo electronico, o presiones <b>Cancelar</b> para editar los datos ingresados";
+                //nombre y correo mal escritos
+            } else if ($nombre_check == false && $correo_check == true) {
+                echo "Su telefono: " . $telefono . " ya esta asociado con otro nombre.<br><br>Presione <b>Actualizar</b> si desea actualizar su nombre, o presiones <b>Cancelar</b> para editar los datos ingresados";
+            }
+        }
+
+
+    }
+} else if ($_REQUEST["motivo"] == "mostrar_clientes") {
+    echo "<tr><th>Nombre</th><th>Duracion</th><th>Categoria</th><th></th><th></th></tr>";
+
+    echo "<tr><th>Nombre</th><th>Telefono</th><th>Correo electronico</th><th></th><th></th></tr>";
+
+    $resultado = mysqli_query($conexion, "SELECT * FROM `clientes`");
+    while ($row = mysqli_fetch_array($resultado)) {
+        echo "<tr class='trr' id='cliente$row[0]'>";
+        echo "<td>$row[1]</td>";
+        echo "<td>$row[2]</td>";
+        echo "<td>$row[3]</td>";
+
+        echo "<td><button type='button' id='buton_tabla' onclick='editar_servicio(\"$row[0]\")'><i class='button_imagen'></td>";
+        echo "<td><input type='checkbox' id='checkbox_borrar'  name='location[]' value='$row[0]|.|$row[2]'></td>";
+        echo "</tr>";
+    }
+
+
+} else if ($_REQUEST["motivo"] == "actualizar_cliente_de_alerta") {
+
+    if (empty($_REQUEST["nombre_cliente"]) && empty($_REQUEST("telefono_cliente")) && empty($_REQUEST("correo_electronico"))) {
+        echo "No has mandado todos los datos!";
+    } else {
+        $nombre_cliente = $_REQUEST["nombre_cliente"];
+        $telefono_cliente = $_REQUEST["telefono_cliente"];
+        $correo_electronico = $_REQUEST["correo_electronico"];
+
+        mysqli_query($conexion, "UPDATE `clientes` SET `nombreCliente` = '$nombre_cliente', `correoCliente` = '$correo_electronico' WHERE `telefonoCliente` = $telefono_cliente");
+
+
+        echo "<tr><th>Nombre</th><th>Telefono</th><th>Correo electronico</th><th></th><th></th></tr>";
+
+        $resultado = mysqli_query($conexion, "SELECT * FROM `clientes`");
+        while ($row = mysqli_fetch_array($resultado)) {
+            echo "<tr class='trr' id='cliente$row[0]'>";
+            echo "<td>$row[1]</td>";
+            echo "<td>$row[2]</td>";
+            echo "<td>$row[3]</td>";
+
+            echo "<td><button type='button' id='buton_tabla' onclick='editar_servicio(\"$row[0]\")'><i class='button_imagen'></td>";
+            echo "<td><input type='checkbox' id='checkbox_borrar'  name='location[]' value='$row[0]|.|$row[2]'></td>";
+            echo "</tr>";
+        }
+    }
+} else if ($_REQUEST["motivo"] == "buscador") {
+    if (!empty($_REQUEST["cadena"])) {
+        $cadena_a_buscar = $_REQUEST["cadena"];
+        $tipo_de_valor_a_buscar = $_REQUEST["tipo_de_valor"];
+
+        if ($tipo_de_valor_a_buscar == "Telefono") {
+            $tipo_de_valor_a_buscar = "telefonoCliente";
+        } elseif ($tipo_de_valor_a_buscar == "Nombre") {
+            $tipo_de_valor_a_buscar = "nombreCliente";
+        } else {
+            $tipo_de_valor_a_buscar = "correoCliente";
+        }
+
+        echo "<tr><th>Nombre</th><th>Telefono</th><th>Correo electronico</th><th></th><th></th></tr>";
+
+        $resultado = mysqli_query($conexion, "SELECT * FROM clientes WHERE $tipo_de_valor_a_buscar = '$cadena_a_buscar'");
+        while ($row = mysqli_fetch_array($resultado)) {
+            echo "<tr class='trr' id='cliente$row[0]'>";
+            echo "<td>$row[1]</td>";
+            echo "<td>$row[2]</td>";
+            echo "<td>$row[3]</td>";
+
+            echo "<td><button type='button' id='buton_tabla' onclick='editar_cliente(\"$row[0]\")'><i class='button_imagen'></td>";
+            echo "<td><input type='checkbox' id='checkbox_borrar'  name='location[]' value='$row[0]|.|$row[2]'></td>";
+            echo "</tr>";
+        }
+    } else {
+        echo "<tr><th>Nombre</th><th>Telefono</th><th>Correo electronico</th><th></th><th></th></tr>";
+        $resultado = mysqli_query($conexion, "SELECT * FROM clientes");
+        while ($row = mysqli_fetch_array($resultado)) {
+            echo "<tr class='trr' id='cliente$row[0]'>";
+            echo "<td>$row[1]</td>";
+            echo "<td>$row[2]</td>";
+            echo "<td>$row[3]</td>";
+
+            echo "<td><button type='button' id='buton_tabla' onclick='editar_cliente(\"$row[0]\")'><i class='button_imagen'></td>";
+            echo "<td><input type='checkbox' id='checkbox_borrar'  name='location[]' value='$row[0]|.|$row[2]'></td>";
+            echo "</tr>";
+        }
+    }
+} else if ($_REQUEST["motivo"] == "editar_cita") {
+    if (isset($_REQUEST["cita"])) {
+        $cita = $_REQUEST["cita"];
+
+        $query = mysqli_query($conexion, "SELECT * FROM citas WHERE idCita = '$cita'");
+        $contador = mysqli_num_rows($query);
+
+        if ($contador == 1) {
+            while ($row = mysqli_fetch_array($query)) {
+                echo "Fecha:<br><br>";
+                echo "<input type='date' id='fecha2' value='$row[1]'><br><br>";
+
+                echo "Hora inicio:<br><br>";
+                $hora_inicio = substr($row[2], 0, 5);
+                echo "<input type='text' id='hora_inicio2' value='$hora_inicio'><br><br>";
+
+                echo "Hora fin:<br><br>";
+                $hora_fin = substr($row[3], 0, 5);
+                echo "<input type='text' id='hora_fin2' value='$hora_fin'><br><br>";
+
+                echo "Nombre empleado:<br><br>";
+                echo "<input type='text' id='nombre_empleado2' value='$row[4]'><br><br>";
+
+                echo "Servicio:<br><br>";
+                echo "<input type='text' id='servicio2' value='$row[5]'><br><br>";
+
+                echo "Nombre cliente:<br><br>";
+                $resultado2 = mysqli_query($conexion, "SELECT * FROM `clientes` WHERE `idCliente` = $row[6]");
+                if (mysqli_num_rows($resultado2) == 0) {
+                    echo "<input type='text' id='nombre_cliente2' value='Cliente borrado'>";
+                } else {
+                    $row2 = mysqli_fetch_array($resultado2);
+                    echo "<input type='text' id='nombre_cliente2' value='$row2[1]'>";
+                }
+            }
+        }
+    }
+} else if ($_REQUEST["motivo"] == "eliminar_cita") {
+    if (isset($_REQUEST["citas"]) && $_REQUEST["citas"] != "") {
+        $citas = json_decode($_REQUEST["citas"]);
+        echo "ESTOS SON LAS CITAS QUE HAY QUE BORRAR ==>>>  ";
+
+        echo count($citas) . "<br>";
+        print_r($citas);
+
+        for ($x = 0; $x < count($citas); $x++) {
+            $id = $citas[$x][0];
+            mysqli_query($conexion, "DELETE FROM `citas` WHERE `idCita` = '$id'");
+        }
+    }
+} else if ($_REQUEST["motivo"] == "buscador_citas") {
+    if (!empty($_REQUEST["cadena"])) {
+        $cadena_a_buscar = $_REQUEST["cadena"];
+        $tipo_de_valor_a_buscar = $_REQUEST["tipo_de_valor"];
+        $array_ids_clientes = array();
+
+        if ($tipo_de_valor_a_buscar == "Fecha") {
+            $tipo_de_valor_a_buscar = "fecha";
+        } elseif ($tipo_de_valor_a_buscar == "Nombre empleado") {
+            $tipo_de_valor_a_buscar = "nombreEmpleado";
+        } elseif ($tipo_de_valor_a_buscar == "Servicio") {
+            $tipo_de_valor_a_buscar = "nombreServicio";
+        } elseif ($tipo_de_valor_a_buscar == "Nombre cliente") {
+
+            //sacamos todos los ids de todos los clientes que tengan el nombre tecleado y los metemos en un array que vamos a recorrer despues
+            $nombre = mysqli_query($conexion, "SELECT * FROM clientes WHERE nombreCliente = '$cadena_a_buscar'");
+            while ($row2 = mysqli_fetch_array($nombre)) {
+                array_push($array_ids_clientes, $row2[0]);
+            }
+        }
+
+        echo "<tr><th>Fecha</th><th>Hora inicio</th><th>Hora fin</th><th>Nombre empleado</th><th>Servicio</th><th>Nombre cliente</th><th></th><th></th></tr>";
+
+        //si estamos buscando por nombre de cliente la busqueda en la tabla de citas se realiza de otra forma
+        //si buscamos juan y en la tabla de clientes tenemos 10 usuarios con el nombre juan, la tabla nos devuelve todos los ids de todos los clientes con ese nombre
+        //despues por cada id de cliente realizamos una busqueda en la tabla de citas y sacamos las citas que tiene ese id
+        //finalmente se muestran todas las citas de todos los usuarios con ese nombre
+        if ($tipo_de_valor_a_buscar == "Nombre cliente") {
+            for ($x = 0; $x < count($array_ids_clientes); $x++) {
+                $resultado = mysqli_query($conexion, "SELECT * FROM citas WHERE idCliente = $array_ids_clientes[$x]");
+                $contador = mysqli_num_rows($resultado);
+
+                while ($row3 = mysqli_fetch_array($resultado)) {
+                    echo "<tr class='trr' id='cita$row3[0]'>";
+                    echo "<td>$row3[1]</td>";
+                    echo "<td>" . substr($row3[2], 0, 5) . "</td>";
+                    echo "<td>" . substr($row3[3], 0, 5) . "</td>";
+                    echo "<td>$row3[4]</td>";
+                    echo "<td>$row3[5]</td>";
+
+                    $resultado2 = mysqli_query($conexion, "SELECT * FROM `clientes` WHERE `idCliente` = $row3[6]");
+                    if (mysqli_num_rows($resultado2) == 0) {
+                        echo "<td>Cliente borrado</td>";
+                    } else {
+                        $row2 = mysqli_fetch_array($resultado2);
+                        echo "<td>$row2[1]</td>";
+                    }
+
+                    echo "<td><button type='button' id='buton_tabla' onclick='editar_cita(\"$row[0]\")'><i class='button_imagen'></td>";
+                    echo "<td><input type='checkbox' id='checkbox_borrar'  name='location[]' value='$row[0]|.|$row[2]'></td>";
+                    echo "</tr>";
+                }
+            }
+        } else {
+            //si estamos buscando por fecha, nombre de empleado o servicio entra en este else
+            $resultado = mysqli_query($conexion, "SELECT * FROM citas WHERE $tipo_de_valor_a_buscar = '$cadena_a_buscar'");
+            while ($row = mysqli_fetch_array($resultado)) {
+                echo "<tr class='trr' id='cita$row[0]'>";
+                echo "<td>$row[1]</td>";
+                echo "<td>" . substr($row[2], 0, 5) . "</td>";
+                echo "<td>" . substr($row[3], 0, 5) . "</td>";
+                echo "<td>$row[4]</td>";
+                echo "<td>$row[5]</td>";
+
+                $resultado2 = mysqli_query($conexion, "SELECT * FROM `clientes` WHERE `idCliente` = $row[6]");
+                if (mysqli_num_rows($resultado2) == 0) {
+                    echo "<td>Cliente borrado</td>";
+                } else {
+                    $row2 = mysqli_fetch_array($resultado2);
+                    echo "<td>$row2[1]</td>";
+                }
+                echo "<td><button type='button' id='buton_tabla' onclick='editar_cita(\"$row[0]\")'><i class='button_imagen'></td>";
+                echo "<td><input type='checkbox' id='checkbox_borrar'  name='location[]' value='$row[0]|.|$row[2]'></td>";
+                echo "</tr>";
+            }
+        }
+    } else {
+        echo "<tr><th>Fecha</th><th>Hora inicio</th><th>Hora fin</th><th>Nombre empleado</th><th>Servicio</th><th>Nombre cliente</th><th></th><th></th></tr>";
+        $resultado = mysqli_query($conexion, "SELECT * FROM citas");
+        while ($row = mysqli_fetch_array($resultado)) {
+            echo "<tr class='trr' id='cita$row[0]'>";
+            echo "<td>$row[1]</td>";
+            echo "<td>" . substr($row[2], 0, 5) . "</td>";
+            echo "<td>" . substr($row[3], 0, 5) . "</td>";
+            echo "<td>$row[4]</td>";
+            echo "<td>$row[5]</td>";
+
+            $resultado2 = mysqli_query($conexion, "SELECT * FROM `clientes` WHERE `idCliente` = $row[6]");
+            if (mysqli_num_rows($resultado2) == 0) {
+                echo "<td>Cliente borrado</td>";
+            } else {
+                $row2 = mysqli_fetch_array($resultado2);
+                echo "<td>$row2[1]</td>";
+            }
+            echo "<td><button type='button' id='buton_tabla' onclick='editar_cita(\"$row[0]\")'><i class='button_imagen'></td>";
+            echo "<td><input type='checkbox' id='checkbox_borrar'  name='location[]' value='$row[0]|.|$row[2]'></td>";
+            echo "</tr>";
         }
     }
 }

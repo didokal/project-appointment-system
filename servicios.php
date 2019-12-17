@@ -2,7 +2,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
 <h1>Menu</h1>
@@ -12,6 +12,9 @@
     <li><a href="empleados.php">Empleados</a></li>
     <li><a href="categorias.php">Categorias</a></li>
     <li><a href="servicios.php">Servicios</a></li>
+    <li><a href="calendario_show_appointments.html">Calendario con citas</a></li>
+    <li><a href="clientes.php">Clientes</a></li>
+    <li><a href="citas.php">Citas</a></li>
 </ul>
 <hr style="color: #0056b2"/>
 <br><br><br>
@@ -123,10 +126,63 @@
 </div>
 
 
+<div id="miAlerta3" class="alerta">
+    <div class="alerta-content">
+
+        <span id="alert-text5"></span>
+        <div id="alert-footer">
+            <span id="alert_actualizar" onclick="alert_back2()">Volver y corregir los datos introducidos</span>
+            <span id="alert_cancelar" onclick="alert_cancel()">Cancelar</span>
+        </div>
+    </div>
+</div>
+
+<div id="miAlerta4" class="alerta">
+    <div class="alerta-content">
+
+        <span id="alert-text6"></span>
+        <div id="alert-footer">
+            <span id="alert_actualizar" onclick="alert_back3()">Volver y corregir los datos introducidos</span>
+            <span id="alert_cancelar" onclick="alert_cancel()">Cancelar</span>
+        </div>
+    </div>
+</div>
+
+
+<div id="miAlerta2" class="alerta">
+    <div class="alerta-content">
+
+        <span id="alert-text4"></span>
+        <div id="alert-footer">
+            <span id="alert_ok" onclick="alert_ok()">OK</span>
+        </div>
+    </div>
+</div>
+
+
 <script>
     var datos = "";
     var servicios_para_borrar = [];
     var id_servicio = "";
+
+    function alert_ok() {
+        document.getElementById("miAlerta2").style.display = "none";
+    }
+
+    function alert_cancel() {
+        document.getElementById("miAlerta3").style.display = "none";
+    }
+
+    function alert_back2() {
+        document.getElementById("miAlerta3").style.display = "none";
+        document.getElementById("miSlidePanel").style.display = "block";
+    }
+
+    function alert_back3() {
+        document.getElementById("miAlerta4").style.display = "none";
+        document.getElementById("miSlidePanel2").style.display = "block";
+    }
+
 
     document.getElementById("buton_borrar").addEventListener("click", function () {
         // Query for only the checked checkboxes and put the result in an array
@@ -141,20 +197,26 @@
             datos += cb.value + ",";
         });
 
-        var xhttp = new XMLHttpRequest();
-        xhttp.onreadystatechange = function () {
-            if (this.readyState == 4 && this.status == 200) {
-                console.log(this.responseText);
-                console.log(servicios_para_borrar);
+        if (servicios_para_borrar.length > 0) {
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    console.log(this.responseText);
+                    console.log(servicios_para_borrar);
 
-                //eliminamos los divs con los servicios seleccionados
-                for (var x = 0; x < servicios_para_borrar.length; x++) {
-                    document.getElementById(servicios_para_borrar[x]).innerHTML = '';
+                    //eliminamos los divs con los servicios seleccionados
+                    for (var x = 0; x < servicios_para_borrar.length; x++) {
+                        document.getElementById(servicios_para_borrar[x]).innerHTML = '';
+                    }
+
+                    document.getElementById("alert-text4").innerHTML = "La operación ha sido realizada con exito!";
+                    document.getElementById("miAlerta2").style.display = "block";
                 }
-            }
-        };
-        xhttp.open("POST", "ajax2.php?motivo=eliminar_servicio" + "&servicios=" + datos);
-        xhttp.send();
+            };
+            xhttp.open("POST", "ajax2.php?motivo=eliminar_servicio" + "&servicios=" + datos);
+            xhttp.send();
+
+        }
     });
 
 
@@ -184,19 +246,23 @@
             if (this.readyState == 4 && this.status == 200) {
                 console.log(this.responseText);
                 document.getElementById("miSlidePanel").style.display = "none";
-                document.getElementById("tabla").innerHTML = '';
 
 
-                var xhttp2 = new XMLHttpRequest();
-                xhttp2.onreadystatechange = function () {
-                    if (this.readyState == 4 && this.status == 200) {
-                        console.log("RESUALTADO >>> " + this.responseText);
-
-                        document.getElementById("tabla").innerHTML = this.responseText;
-                    }
-                };
-                xhttp2.open("POST", "ajax2.php?motivo=mostrar_servicios");
-                xhttp2.send();
+                if (this.responseText.includes("ERROR")) {
+                    document.getElementById("alert-text5").innerHTML = this.responseText;
+                    document.getElementById("miAlerta3").style.display = "block";
+                } else {
+                    var xhttp2 = new XMLHttpRequest();
+                    xhttp2.onreadystatechange = function () {
+                        if (this.readyState == 4 && this.status == 200) {
+                            document.getElementById("alert-text4").innerHTML = "El servicio ha sido añadido satisfactoriamente";
+                            document.getElementById("miAlerta2").style.display = "block";
+                            document.getElementById("tabla").innerHTML = this.responseText;
+                        }
+                    };
+                    xhttp2.open("POST", "ajax2.php?motivo=mostrar_servicios");
+                    xhttp2.send();
+                }
             }
         };
         xhttp.open("POST", "ajax2.php?motivo=anadir_servicio" + "&servicio=" + servicio + "&duracion=" + duracion + "&categoria=" + categoria);
@@ -240,11 +306,18 @@
         var xhttp2 = new XMLHttpRequest();
         xhttp2.onreadystatechange = function () {
             if (this.readyState == 4 && this.status == 200) {
-                console.log(this.responseText);
-
                 document.getElementById("miSlidePanel2").style.display = "none";
-                document.getElementById("tabla").innerHTML = '';
-                document.getElementById("tabla").innerHTML = this.responseText;
+
+                if (this.responseText.includes("ERROR")) {
+                    document.getElementById("alert-text6").innerHTML = this.responseText;
+                    document.getElementById("miAlerta4").style.display = "block";
+                }else{
+                    document.getElementById("alert-text4").innerHTML = "El servicio ha sido actualizado satisfactoriamente";
+                    document.getElementById("miAlerta2").style.display = "block";
+
+                    document.getElementById("tabla").innerHTML = '';
+                    document.getElementById("tabla").innerHTML = this.responseText;
+                }
             }
         };
         xhttp2.open("POST", "ajax2.php?motivo=actualizar_servicio" + "&nombre_servicio=" + nombreserv + "&duracion_servicio=" + duracionserv + "&categoria_servicio=" + categoriaserv + "&idServicio=" + id_servicio);

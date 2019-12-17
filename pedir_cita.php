@@ -1,18 +1,20 @@
 <?php
 session_start();
-$conexion = new mysqli("localhost", "root", "", "citas", "3306");
+$conexion = new mysqli("localhost", "root", "", "citas2", "3306");
 
 if ($conexion->connect_error) {
     die("Error conexion bd: " . $conexion->connect_error);
 }
+
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="styles-calendar.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/styles-calendar.css">
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
     <script>
         //metodo que me devuelve el valor de una cookie
@@ -65,6 +67,9 @@ if ($conexion->connect_error) {
     <li><a href="empleados.php">Empleados</a></li>
     <li><a href="categorias.php">Categorias</a></li>
     <li><a href="servicios.php">Servicios</a></li>
+    <li><a href="calendario_show_appointments.html">Calendario con citas</a></li>
+    <li><a href="clientes.php">Clientes</a></li>
+    <li><a href="citas.php">Citas</a></li>
 </ul>
 <hr style="color: #0056b2" />
 <br><br><br>
@@ -157,7 +162,7 @@ if ($conexion->connect_error) {
 echo "asd";
 
 
-$file = file_get_contents('calendario.php');
+$file = file_get_contents('calendario_make_appointment.php');
 $content = eval("?>$file");
 echo $content;
 
@@ -364,7 +369,9 @@ echo $content;
         <h3>La reserva fue realizada con exito!</h3>
         <div id="datos_cliente"></div>
     </div>
+    <!--
     <button id="buton" onclick="show(3)">Atras</button>
+    -->
 </div>
 
 
