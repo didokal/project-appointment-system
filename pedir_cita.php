@@ -12,7 +12,7 @@ if ($conexion->connect_error) {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Pedir cita</title>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/styles-calendar.css">
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
@@ -71,7 +71,7 @@ if ($conexion->connect_error) {
     <li><a href="clientes.php">Clientes</a></li>
     <li><a href="citas.php">Citas</a></li>
 </ul>
-<hr style="color: #0056b2" />
+<hr style="color: #0056b2"/>
 <br><br><br>
 <h1>Haz tu reserva ahora</h1>
 
@@ -158,16 +158,16 @@ if ($conexion->connect_error) {
         </div>
         <div id="right">
             Selecciona una fecha:
-<?php
-echo "asd";
+            <?php
+            echo "asd";
 
 
-$file = file_get_contents('calendario_make_appointment.php');
-$content = eval("?>$file");
-echo $content;
+            $file = file_get_contents('calendario_make_appointment.php');
+            $content = eval("?>$file");
+            echo $content;
 
 
-?>
+            ?>
         </div>
     </div>
     <button id="buton" onclick="show(2); seleccionar_hora(2)">Sigueinte</button>
@@ -199,22 +199,11 @@ echo $content;
                 xhttp.onreadystatechange = function () {
                     if (this.readyState == 4 && this.status == 200) {
 
-
-                        //console.log(this.responseText);
                         document.getElementById("scroll-content").innerHTML = this.responseText;
-
 
                         var fecha_partida = getCookie('fecha').split('-');
 
-
-
-
-                        document.getElementById('diaSeleccionado').innerHTML = getCookie('diaSemana') + ", " + fecha_partida[2] + " de " +document.getElementById("month").innerText;
-
-
-
-
-
+                        document.getElementById('diaSeleccionado').innerHTML = getCookie('diaSemana') + ", " + fecha_partida[2] + " de " + document.getElementById("month").innerText;
                     }
                 };
                 xhttp.open("POST", "ajax.php?pagg=" + pagina + "&fecha=" + getCookie('fecha') + "&empleado=" + getCookie('empleado') + "&servicio=" + getCookie('servicio') + "&diaSemana=" + getCookie('diaSemana'), true);
@@ -275,8 +264,6 @@ echo $content;
             var xhttp = new XMLHttpRequest();
             xhttp.onreadystatechange = function () {
                 if (this.readyState == 4 && this.status == 200) {
-
-
                     console.log(this.responseText);
 
                     //sacamos una alerta si se han metido datos que no concuerdan con el telefono
@@ -290,8 +277,6 @@ echo $content;
                         document.getElementById("datos_cliente").innerHTML = this.responseText;
                         show(4);
                     }
-
-
                 }
             };
             xhttp.open("POST", "ajax.php?pagg=" + pagina + "&nombre=" + nombre.value + "&telefono=" + telefono.value + "&correo=" + correo.value + "&nota=" + nota.value + "&fecha=" + getCookie('fecha') + "&hora=" + getCookie('hora') + "&empleado=" + getCookie('empleado') + "&servicio=" + getCookie('servicio'), true);
@@ -330,14 +315,35 @@ echo $content;
                 document.getElementById('correo').style.backgroundColor = "#e4b3a7";
                 return false;
             }
-
             return true;
+        }
 
+
+
+        function alert_update() {
+            document.getElementById("miAlerta").style.display = "none";
+
+            var nombrecliente = document.getElementById('nombre').value;
+            var telefonocliente = document.getElementById('telefono').value;
+            var correoelectronico = document.getElementById('correo').value;
+
+            console.log(nombrecliente);
+            console.log(telefonocliente);
+            console.log(correoelectronico);
+
+            var xhttp2 = new XMLHttpRequest();
+            xhttp2.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    console.log(this.responseText);
+                }
+            };
+            xhttp2.open("POST", "ajax2.php?motivo=actualizar_cliente_desde_resrv_cita" + "&nombre_cliente=" + nombrecliente + "&telefono_cliente=" + telefonocliente + "&correo_electronico=" + correoelectronico);
+            xhttp2.send();
         }
     </script>
 
 
-    <button id="buton" onclick="show(2); disminuir_pag(2)">Atras</button>
+    <button id="buton" onclick="show(2); ">Atras</button>
     <button id="buton" onclick="show(3); validar_datos(); if(validar_datos() == true){datos_cliente(3)}">Sigueinte
     </button>
 </div>
@@ -376,17 +382,8 @@ echo $content;
 
 
 <script>
-
+    //por defecto cargamos el primer contenedor
     show(1);
-
-    /*
-        document.getElementById("alert_actualizar").onclick = function() {
-            var modal = document.getElementById("miAlerta");
-            modal.style.display = "none";
-            alert("aki");
-        }
-    */
-
 
     function show(i) {
         document.getElementById("contenedor1").style.display = "none";
@@ -399,10 +396,6 @@ echo $content;
         } catch (ignored) {
         }
     }
-
-
 </script>
-
-
 </body>
 </html>

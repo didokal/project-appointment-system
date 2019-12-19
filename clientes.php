@@ -142,6 +142,17 @@
 </div>
 
 
+<div id="miAlerta7" class="alerta">
+    <div class="alerta-content">
+        <span id="alert-text7"></span>
+        <div id="alert-footer">
+            <span id="alert_actualizar" onclick="alert_back7()">Volver y corregir los datos introducidos</span>
+            <span id="alert_cancelar" onclick="alert_cancel()">Cancelar</span>
+        </div>
+    </div>
+</div>
+
+
 <div id="miAlerta2" class="alerta">
     <div class="alerta-content">
 
@@ -228,6 +239,12 @@
     }
 
 
+    function alert_back7() {
+        document.getElementById("miAlerta7").style.display = "none";
+        document.getElementById("miSlidePanel").style.display = "block";
+    }
+
+
     function alert_ok() {
         document.getElementById("miAlerta2").style.display = "none";
     }
@@ -252,7 +269,6 @@
         xhttp.onreadystatechange = function () {
             if (this.readyState == 4 && this.status == 200) {
                 console.log(this.responseText);
-                console.log("asd");
                 console.log(clientes_para_borrar);
 
                 //eliminamos los divs con los servicios seleccionados
@@ -263,6 +279,9 @@
         };
         xhttp.open("POST", "ajax2.php?motivo=eliminar_cliente" + "&clientes=" + valParam);
         xhttp.send();
+
+        document.getElementById("alert-text4").innerHTML = "La operación ha sido realizada con exito!";
+        document.getElementById("miAlerta2").style.display = "block";
     });
 
 
@@ -294,15 +313,20 @@
 
                 if (this.responseText.includes("Su telefono")) {
                     document.getElementById("miSlidePanel").style.display = "none";
-
                     document.getElementById("alert-text3").innerHTML = this.responseText;
-                    //mostramos la alerta
                     document.getElementById("miAlerta").style.display = "block";
-                } else {
+                } else if(this.responseText.includes("Ya existe un usuario")){
+                    document.getElementById("miSlidePanel").style.display = "none";
+                    document.getElementById("alert-text7").innerHTML = this.responseText;
+                    document.getElementById("miAlerta7").style.display = "block";
+                }else {
+                    document.getElementById("miSlidePanel").style.display = "none";
+                    document.getElementById("alert-text4").innerHTML = "El cliente ha sido creado satisfactoriamente!";
+                    document.getElementById("miAlerta2").style.display = "block";
+
                     var xhttp2 = new XMLHttpRequest();
                     xhttp2.onreadystatechange = function () {
                         if (this.readyState == 4 && this.status == 200) {
-                            document.getElementById("miSlidePanel").style.display = "none";
                             document.getElementById("tabla").innerHTML = '';
                             document.getElementById("tabla").innerHTML = this.responseText;
                         }
@@ -368,7 +392,5 @@
         xhttp2.open("POST", "ajax2.php?motivo=actualizar_cliente" + "&nombre_cliente=" + nombrecliente + "&telefono_cliente=" + telefonocliente + "&correo_electronico=" + correoelectronico + "&idCliente=" + id_cliente);
         xhttp2.send();
     });
-
-
 </script>
 </body>

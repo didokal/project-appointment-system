@@ -157,7 +157,6 @@ if ($_REQUEST["pagg"] == 1) {
                 $duracion_servicio = mysqli_fetch_array($resultado4)[0];
             }
 
-
             echo "<span style='color:red'>DURACION PRUEBA SIN PARTIR: $duracion_servicio</span><br>";
             $duracion_prueba = $duracion_servicio / 15;
             echo "DURACION PRUEBA DIVIDIDA: $duracion_prueba<br><br>";
@@ -189,13 +188,13 @@ if ($_REQUEST["pagg"] == 1) {
                 //sabremos cuantas casillas tenemos que saltar
                 if ($indice == ($indice_inicio + $duracion_prueba) /* -1 pongo MENOS UNO y ya no habra descansos*/) {
                     //aqui controlo que no sea la primera vez que entra porque me agregaba un campo de mas
-                    if ($indice_inicio != 0) {
+                    //if ($indice_inicio != 0) {
                         $hora_fin = $hora;
                         echo "DURACION FIN: $indice<br>";
                         echo "HORA FIN: $hora_fin<br><br>";
                         $variable_para_anadir_array_reservas_duracion["posicion2"] = $indice;
                         array_push($array_reservas_duracion, $variable_para_anadir_array_reservas_duracion);
-                    }
+                   // }
                 }
             }
 
@@ -219,44 +218,7 @@ if ($_REQUEST["pagg"] == 1) {
         echo "<br><br><br>";
 
 
-        ///este es el codigo que me hace la comprobacion si el servicio escogido por su duración cabe entre las reservas
-        /// ya existentes
 
-        /*
-        $diferencia = 0;
-        $indice_para_borar = "";
-
-        echo "CONTADOR: " . count($array_reservas_duracion);
-        for($x = 0; $x < count($array_reservas_duracion); $x++){
-            if($x < count($array_reservas_duracion)-1){
-                echo "<h2>$x</h2>";
-                echo "<h4>" . $array_reservas_duracion[$x+1]["posicion1"] . "</h4>";
-                echo "<h4>" . $array_reservas_duracion[$x]["posicion2"] . "</h4>";
-
-                $diferencia = $array_reservas_duracion[$x+1]["posicion1"] - $array_reservas_duracion[$x]["posicion2"];
-                echo "DIFERENCIA ". $diferencia . "<br>";
-
-                if($diferencia <= $duracion_servicio_seleccionado){
-                    echo "HAY QUE BORRARRR!<br>";
-
-                    echo $mayor = $array_reservas_duracion[$x]["posicion2"]+1;
-                    echo "<br>";
-                    echo $menor = $array_reservas_duracion[$x+1]["posicion1"]-1;
-                    echo "<br>";
-
-                    for($i = $mayor; $i <= $menor; $i++){
-                        echo "<b> esta posicion $i</b>";
-                        for($o = 0; $o < count($array_horario); $o++){
-                            if($o == $i){
-                                array_push($array_horas_para_eliminar, $array_horario[$o]);
-                                echo "borrado!";
-                            }
-                        }
-                    }
-                }
-            }
-        }
-*/
 
 
         echo "<br><br><br>Array con horas eliminadas<br>";
@@ -299,7 +261,10 @@ if ($_REQUEST["pagg"] == 1) {
                 }
             } else {
                 if ($asignado == false) {
-                    array_push($array_conjunto_huecos_libres, $array_conjunto_huecos_libres_temporal);
+
+                    if($array_conjunto_huecos_libres_temporal["inicio"] != ""){
+                        array_push($array_conjunto_huecos_libres, $array_conjunto_huecos_libres_temporal);
+                    }
                     $contador = 0;
                     $asignado = true;
                     $primera_vez = true;
@@ -530,7 +495,7 @@ if ($_REQUEST["pagg"] == 1) {
 
 
 
-    $hora_seleccionada = "09:00";
+    $hora_seleccionada = "08:00";
     $contador_duracion_servicio = 0;
     $pasar = false;
     $hora_fin = '00:00';

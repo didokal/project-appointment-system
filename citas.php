@@ -168,7 +168,7 @@
     </div>
 </div>
 
-
+-->
 <div id="miAlerta2" class="alerta">
     <div class="alerta-content">
 
@@ -178,7 +178,7 @@
         </div>
     </div>
 </div>
--->
+
 <script>
     var datos = "";
     var citas_para_borrar = [];
@@ -223,11 +223,11 @@
             document.getElementById("miSlidePanel2").style.display = "block";
         }
 
+*/
+    function alert_ok() {
+        document.getElementById("miAlerta2").style.display = "none";
+    }
 
-        function alert_ok() {
-            document.getElementById("miAlerta2").style.display = "none";
-        }
-    */
     document.getElementById("buton_borrar").addEventListener("click", function () {
         // Query for only the checked checkboxes and put the result in an array
         let checked = Array.prototype.slice.call(document.querySelectorAll("input[type='checkbox']:checked"));
@@ -258,6 +258,9 @@
         };
         xhttp.open("POST", "ajax2.php?motivo=eliminar_cita" + "&citas=" + valParam);
         xhttp.send();
+
+        document.getElementById("alert-text4").innerHTML = "La operación ha sido realizada con exito!";
+        document.getElementById("miAlerta2").style.display = "block";
     });
 
 

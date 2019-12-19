@@ -713,7 +713,7 @@ if ($_REQUEST["motivo"] == "eliminar_empleado") {
                 echo "<td>$row[2]</td>";
                 echo "<td>$row[3]</td>";
 
-                echo "<td><button type='button' id='buton_tabla' onclick='editar_servicio(\"$row[0]\")'><i class='button_imagen'></td>";
+                echo "<td><button type='button' id='buton_tabla' onclick='editar_cliente(\"$row[0]\")'><i class='button_imagen'></td>";
                 echo "<td><input type='checkbox' id='checkbox_borrar'  name='location[]' value='$row[0]|.|$row[2]'></td>";
                 echo "</tr>";
             }
@@ -753,50 +753,56 @@ if ($_REQUEST["motivo"] == "eliminar_empleado") {
         //////////////////////////////////////////////////////////////////////
         ////////////COMPRUEBO SI LOS DATOS INTRODUCIDOS COINCIDEN/////////////
         //////////////////////////////////////////////////////////////////////
-        /// LA VALIDACION se hace con el telefono, si el telefono existe en la BD pero los otros datos que se han metido son distintos a los datos
-        /// que estan asociados al telefono en la BD, me dara alerta diciendo que el nombre y/o coreo estan mal
-        //pero si meto un telefono que no existe en la BD con el mismo correo y nombre que si existen en la BD entonces se creara nuevo usuario
-        $resultado = mysqli_query($conexion, "SELECT nombreCliente, correoCliente from clientes WHERE telefonoCliente = '$telefono'");
+
+
+        $resultado = mysqli_query($conexion, "SELECT nombreCliente, telefonoCliente, correoCliente from clientes WHERE nombreCliente = '$nombre' AND telefonoCliente = '$telefono' AND correoCliente = '$correo_electronico'");
         $contador1 = mysqli_num_rows($resultado);
-        if ($contador1 != 0) {
-            while ($row = mysqli_fetch_array($resultado)) {
+        if ($contador1 == 1) {
+            echo "Ya existe un usuario con los datos insertados!";
+        } else {
+            /// LA VALIDACION se hace con el telefono, si el telefono existe en la BD pero los otros datos que se han metido son distintos a los datos
+            /// que estan asociados al telefono en la BD, me dara alerta diciendo que el nombre y/o coreo estan mal
+            //pero si meto un telefono que no existe en la BD con el mismo correo y nombre que si existen en la BD entonces se creara nuevo usuario
+            $resultado = mysqli_query($conexion, "SELECT nombreCliente, correoCliente from clientes WHERE telefonoCliente = '$telefono'");
+            $contador1 = mysqli_num_rows($resultado);
+            if ($contador1 != 0) {
+                while ($row = mysqli_fetch_array($resultado)) {
 
-                if ($nombre != $row[0]) {
-                    $nombre_check = false;
+                    if ($nombre != $row[0]) {
+                        $nombre_check = false;
+                    }
+                    if ($correo_electronico != $row[1]) {
+                        $correo_check = false;
+                    }
                 }
+            } else {
+                $nombre_check = false;
+                $correo_check = false;
+                $telefono_check = false;
+            }
 
-                if ($correo_electronico != $row[1]) {
-                    $correo_check = false;
+
+            //si todos los datos son nuevos para el servidor INSERTAMOS EL NUEVO USUARIO
+            if ($nombre_check == false && $telefono_check == false && $correo_check == false) {
+                $insertar = "INSERT INTO clientes (nombreCliente, telefonoCliente, correoCliente) VALUES ('$nombre', '$telefono', '$correo_electronico')";
+                $conexion->query($insertar);
+                echo "Se ha añadido el cliente <b>" . $nombre . "</b> con exito!<br><br>";
+
+            } else {
+                //correo mal escrito
+                if ($nombre_check == true && $correo_check == false) {
+                    echo "Su telefono: " . $telefono . " ya esta asociado con otro correo electronico.<br><br>Presione <b>Actualizar</b> si desea actualizar el correo electronico, o presiones </b>Cancelar</b> para editar los datos ingresados";
+                    //nombre mal escrito
+                } else if ($nombre_check == false && $correo_check == false) {
+                    echo "Su telefono: " . $telefono . " ya esta asociado con otro nombre y correo electronico.<br><br>Presione <b>Actualizar</b> si desea actualizar su nombre y correo electronico, o presiones <b>Cancelar</b> para editar los datos ingresados";
+                    //nombre y correo mal escritos
+                } else if ($nombre_check == false && $correo_check == true) {
+                    echo "Su telefono: " . $telefono . " ya esta asociado con otro nombre.<br><br>Presione <b>Actualizar</b> si desea actualizar su nombre, o presiones <b>Cancelar</b> para editar los datos ingresados";
                 }
             }
-        } else {
-            $nombre_check = false;
-            $correo_check = false;
-            $telefono_check = false;
+
+
         }
-
-
-        //si todos los datos son nuevos para el servidor INSERTAMOS EL NUEVO USUARIO
-        if ($nombre_check == false && $telefono_check == false && $correo_check == false) {
-            echo "asd";
-
-            $insertar = "INSERT INTO clientes (nombreCliente, telefonoCliente, correoCliente) VALUES ('$nombre', '$telefono', '$correo_electronico')";
-            $conexion->query($insertar);
-            echo "Se ha añadido el cliente <b>" . $nombre . "</b> con exito!<br><br>";
-
-        } else {
-            //correo mal escrito
-            if ($nombre_check == true && $correo_check == false) {
-                echo "Su telefono: " . $telefono . " ya esta asociado con otro correo electronico.<br><br>Presione <b>Actualizar</b> si desea actualizar el correo electronico, o presiones </b>Cancelar</b> para editar los datos ingresados";
-                //nombre mal escrito
-            } else if ($nombre_check == false && $correo_check == false) {
-                echo "Su telefono: " . $telefono . " ya esta asociado con otro nombre y correo electronico.<br><br>Presione <b>Actualizar</b> si desea actualizar su nombre y correo electronico, o presiones <b>Cancelar</b> para editar los datos ingresados";
-                //nombre y correo mal escritos
-            } else if ($nombre_check == false && $correo_check == true) {
-                echo "Su telefono: " . $telefono . " ya esta asociado con otro nombre.<br><br>Presione <b>Actualizar</b> si desea actualizar su nombre, o presiones <b>Cancelar</b> para editar los datos ingresados";
-            }
-        }
-
 
     }
 } else if ($_REQUEST["motivo"] == "mostrar_clientes") {
@@ -811,7 +817,7 @@ if ($_REQUEST["motivo"] == "eliminar_empleado") {
         echo "<td>$row[2]</td>";
         echo "<td>$row[3]</td>";
 
-        echo "<td><button type='button' id='buton_tabla' onclick='editar_servicio(\"$row[0]\")'><i class='button_imagen'></td>";
+        echo "<td><button type='button' id='buton_tabla' onclick='editar_cliente(\"$row[0]\")'><i class='button_imagen'></td>";
         echo "<td><input type='checkbox' id='checkbox_borrar'  name='location[]' value='$row[0]|.|$row[2]'></td>";
         echo "</tr>";
     }
@@ -838,7 +844,7 @@ if ($_REQUEST["motivo"] == "eliminar_empleado") {
             echo "<td>$row[2]</td>";
             echo "<td>$row[3]</td>";
 
-            echo "<td><button type='button' id='buton_tabla' onclick='editar_servicio(\"$row[0]\")'><i class='button_imagen'></td>";
+            echo "<td><button type='button' id='buton_tabla' onclick='editar_cliente(\"$row[0]\")'><i class='button_imagen'></td>";
             echo "<td><input type='checkbox' id='checkbox_borrar'  name='location[]' value='$row[0]|.|$row[2]'></td>";
             echo "</tr>";
         }
@@ -1031,6 +1037,20 @@ if ($_REQUEST["motivo"] == "eliminar_empleado") {
             echo "<td><input type='checkbox' id='checkbox_borrar'  name='location[]' value='$row[0]|.|$row[2]'></td>";
             echo "</tr>";
         }
+    }
+} else if ($_REQUEST["motivo"] == "actualizar_cliente_desde_resrv_cita") {
+
+    if (empty($_REQUEST["nombre_cliente"]) && empty($_REQUEST("telefono_cliente")) && empty($_REQUEST("correo_electronico"))) {
+        echo "No has mandado todos los datos!";
+    } else {
+        $nombre_cliente = $_REQUEST["nombre_cliente"];
+        $telefono_cliente = $_REQUEST["telefono_cliente"];
+        $correo_electronico = $_REQUEST["correo_electronico"];
+
+        mysqli_query($conexion, "UPDATE `clientes` SET `nombreCliente` = '$nombre_cliente', `correoCliente` = '$correo_electronico' WHERE `telefonoCliente` = $telefono_cliente");
+
+
+        echo "Cliente actualizado";
     }
 }
 
