@@ -1,0 +1,292 @@
+#panel-contenido-contrasena{
+    display: none;
+}
+
+
+body {
+    font-family: Work Sans, Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 400;
+    font-family: Work Sans, Arial, sans-serif;
+    margin: 10px 0;
+}
+
+h3{
+    font-size: 24px;
+}
+
+a {
+    color: white !important;
+}
+
+#logo_and_but_menu_respons{
+    display: none
+}
+
+#menuu_movil{
+    display: none
+}
+
+#menuu {
+    position: absolute;
+    top: 60px;
+    width: 100%;
+    text-align: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+#menuu ul {
+    list-style: none;
+    margin-left: 100px;
+}
+
+#menuu ul li {
+    display: inline-block;
+    color: white;
+    padding: 0 22px;
+    font-weight: 500;
+    position: relative;
+    top: -24px;
+
+}
+
+#menuu ul li a {
+    text-decoration: none;
+    text-transform: uppercase;
+}
+
+.buton_pedir_cita {
+    position: absolute;
+    top: 450px;
+    width: 100%;
+    text-align: center;
+
+}
+
+.buton_pedir_cita a {
+    text-decoration: none;
+}
+
+
+
+#buton_pedir_cita_interior{
+    padding: 18px 40px;
+    border-radius: 30px;
+    color: white;
+    background-color: #52616b;
+    font-size: 27px;
+    cursor: pointer;
+}
+
+.entrar {
+    padding: 10px 23px 9px;
+    line-height: 1;
+
+    border-radius: 30px;
+    border: 2px solid #fff;
+    cursor: pointer;
+    text-align: center;
+}
+
+.perfil {
+    padding: 10px 23px 9px;
+    line-height: 1;
+
+    border-radius: 30px;
+    border: 2px solid #fff;
+    cursor: pointer;
+    text-align: center;
+}
+
+
+.home_page_img{
+    width: 100%;
+    height: 940px;
+    object-fit: cover;
+    display: block;
+    background-color: #04081d;
+}
+
+
+#historia {
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 50px;
+    max-width: 1100px;
+}
+
+#espacio1 {
+    width: 100%;
+    height: 150px;
+    background-color: #f0f5f9;
+}
+
+#espacio2 {
+    width: 100%;
+    height: 150px;
+    background-color: #c9d6df;
+}
+
+#espacio3 {
+    width: 100%;
+    height: 150px;
+    background-color: #52616b;
+}
+
+#servicioss {
+    width: 100%;
+    margin: 0 auto;
+    padding: 50px;
+    max-width: 1100px;
+}
+
+.service {
+    display: inline-block;
+    width: 47%;
+    margin: 0 0;
+    text-align: justify;
+}
+
+.service:nth-child(2n+1){
+    display: inline-block;
+    width: 47%;
+    margin: 25px 0 0 5%;
+    text-align: justify;
+}
+
+.service h3 {
+    text-align: center;
+}
+
+
+#pedir-cita {
+    width: 100%;
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 50px;
+}
+
+#contactoss {
+    width: 100%;
+    max-width: 980px;
+    margin: 0 auto;
+    margin-top: -50px;
+    padding: 0px 70px 88px 70px;
+}
+
+.circulo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    width: 100px;
+    height: 100px;
+    border: 1px solid #e7e7e7;
+    border-radius: 50%;
+    background: #fff;
+    margin: auto;
+}
+
+.titulo-seccion {
+    margin: auto;
+    text-align: center;
+    padding-bottom: 30px
+}
+
+.input1_div {
+    width: calc((100% - 20px) / 2);
+    background-color: #fff;
+    border-radius: 2px;
+    margin-bottom: 30px;
+    display: inline-block;
+    margin-right: 14px;
+}
+
+.input1_input {
+    height: 60px;
+    padding: 0 20px 0 25px;
+    font-size: 20px;
+}
+
+
+.input2_div {
+    width: calc((100% - 20px) / 2);
+    background-color: #fff;
+    border-radius: 2px;
+    margin-bottom: 30px;
+    display: inline-block;
+}
+
+.input2_input {
+    height: 60px;
+    padding: 0 20px 0 25px;
+    font-size: 20px;
+}
+
+
+.input3_div {
+    background-color: #fff;
+    border-radius: 2px;
+    margin-bottom: 30px;
+}
+
+.input3_input {
+    width: 100%;
+    min-height: 199px;
+    padding: 25px 20px 15px 25px;
+    font-size: 20px;
+}
+
+
+.input4_input {
+    width: 100%;
+    padding: 0 20px;
+    height: 50px;
+    border-radius: 4px;
+    background-color: #E2711D;
+    font-size: 18px;
+    color: white;
+    border: none;
+}
+
+
+#footer {
+    width: 100%;
+    height: 230px;
+    /*padding: 70px;*/
+    text-align: center;
+    background-color: #E2711D;
+    color: white;
+}
+
+#fondo {
+    position: fixed;
+    top: -10px;
+    left: -20px;
+    width: 110%;
+    height: 105%;
+    background-image: url(../design/2-2.jpg);
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: cover;
+    transition-property: all;
+    transition-duration: 250ms;
+}
+
+
+#salir {
+    padding: 10px 23px 9px;
+    line-height: 1;
+
+    border-radius: 30px;
+    border: 2px solid #fff;
+    cursor: pointer;
+    text-align: center;
+}
+
+

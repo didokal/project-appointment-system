@@ -1,5 +1,6 @@
 <?php
-$conexion = new mysqli("localhost", "root", "", "citas2", "3306");
+require_once("config.php");
+$conexion = new mysqli(conexion_host, conexion_user, conexion_pass, conexion_bbdd, conexion_port);
 
 $array_final = array();
 $empleados_array = array();

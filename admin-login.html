@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link href="http://fonts.googleapis.com/css?family=Work+Sans&amp;subset=latin,cyrillic" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/styles-index.css">
+</head>
+<body>
+<img id="fondo">
+<div id="admin_login">
+    <div id="admin_login_content">
+        <div>
+            <h2>ВХОД</h2>
+        </div>
+        <form id="loginForm" method="post" onsubmit="login(this); return false;">
+            <input type="hidden" name="function" value="loginEmpleado"/>
+            <div style="padding-bottom:0px">Име:</div>
+            <input type="text" id="usuario" name="user" class="input1">
+
+
+            <div style="float:left; padding-top:17px">Парола:</div>
+            <input id="password" type="password" name="pass" class="input2">
+            <div style="margin-top: 25px;">
+                <div style="float: left; width: 15px; height: 15px;">
+                    <input type="radio" name="type" value="empleado">
+                </div>
+                <div style="float: left; margin-left: 15px">Работник</div>
+            </div>
+
+            <div style="margin-top: 20px; margin-bottom: 70px;" >
+                <div style="float: left; width: 15px; height: 15px;">
+                    <input type="radio" name="type" value="admin">
+                </div>
+                <div style="float: left; margin-left: 15px">Администратор</div>
+            </div>
+
+            <br>
+            <div class="table_buttons">
+                <input type="submit" style="float:right; width: 85px; font-size: 16px;" value="Влез" id="buton_entrar" class="btn">
+                <div style="width: 127px; height: 34px;" id="buton_resetear" class="btn">Зануляване</div>
+            </div>
+        </form>
+    </div>
+    <script>
+        document.getElementById("buton_resetear").addEventListener("click", function () {   
+            document.getElementById("password").value = "";
+            document.getElementById("usuario").value = "";
+        });
+
+
+        function showDialog() {
+            document.body.style.position = "fixed";
+            document.getElementById("dialogsViewer").style.display = "table";
+        }
+
+        function hideDialog() {
+            document.body.style.position = "unset";
+            document.getElementById("dialogsViewer").style.display = "none";
+        }
+
+        function login(formIn) {
+            var form = new FormData(formIn);
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "login-config.php");
+
+            xhr.addEventListener('loadend', () => {
+                if (xhr.responseText !== "1" && xhr.responseText !== "2") {
+                    console.log(xhr.responseText);
+                    alert("Incorrecto");
+                } else {
+                    if (xhr.responseText == "2") {
+                        window.location = "./citas.php";
+                    } else if (xhr.responseText == "1") {
+                        window.location = "./citas.php";
+                    }
+                }
+            }, false);
+
+            xhr.send(form);
+        }
+    </script>
+</body>
+</html>

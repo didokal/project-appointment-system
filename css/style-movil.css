@@ -1,0 +1,218 @@
+.home_page_img {
+    height: 450px !important;
+    min-height: 450px !important;
+    object-fit: cover;
+    display: block;
+    background-color: #04081d;
+}
+
+#historia {
+    margin: 0 auto;
+    padding: 50px;
+    max-width: 550px;
+}
+
+#servicioss {
+    margin: 0 auto;
+    padding: 50px;
+    max-width: 550px;
+}
+
+.service {
+    display: inline-block;
+    width: 100%;
+    margin: 25px 0 0 0;
+    text-align: justify;
+}
+
+.service:nth-child(2n+1){
+    display: inline-block;
+    width: 100%;
+    margin: 25px 0 0 0;
+    text-align: justify;
+}
+
+#pedir-cita {
+    max-width: 450px;
+    margin: 0 auto;
+    padding: 50px 20px;
+}
+
+#contactoss {
+    max-width: 450px;
+    margin: 0 auto;
+    padding: 50px 20px;
+    margin-top: -100px;
+}
+
+
+.buton_pedir_cita {
+    position: absolute;
+    top: 215px;
+    width: 100%;
+    text-align: center;
+}
+
+
+
+#contenedor1 {
+    max-width: 100%;
+    max-width: 840px;
+    height: 1070px !important;
+    padding: 30px 30px 10px;
+    box-shadow: 2px 2px 25px 5px #f0f0f0;
+    border-radius: 15px;
+    background: #fff;
+    margin: auto;
+}
+
+
+#contenedor3 {
+    max-width: 100%;
+    max-width: 840px;
+    height: 830px !important;
+    padding: 30px 30px 10px;
+    box-shadow: 2px 2px 25px 5px #f0f0f0;
+    border-radius: 15px;
+    background: #fff;
+    margin: auto;
+}
+
+#content #left {
+    width: 100% !important;
+    float: left !important;
+    margin-bottom: 15px !important;
+}
+
+#content #right {
+    width: 100% !important;
+    float: right !important;
+    margin-bottom: 15px !important;
+    margin-top: 30px  !important;
+}
+
+#content #right2 {
+    width: 100% !important;
+    float: right !important;
+    margin-bottom: 15px !important;
+}
+
+
+#menuu {
+    display: none
+}
+
+
+#menuu_movil{
+  display: none;
+    background-color: #1e2022;
+    position: absolute;
+    width: 80%;
+    height: 100%;
+    box-shadow: 0 0 10px black;
+    margin: -30px 0 0 70%;
+    padding: 30px;
+    padding-top: 54px;
+    -webkit-font-smoothing: antialiased;
+    transform-origin: 0% 0%;
+    transform: translate(-100%, 0);
+    transition: transform 0.5s cubic-bezier(0.77,0.2,0.05,1.0);
+    z-index: 20;
+}
+
+
+
+#menuu_movil ul {
+    list-style: none;
+    text-align: center;
+    margin-left: 18px;
+}
+
+
+#menuu_movil ul li {
+    display: inline-block;
+    color: white;
+    padding: 0 25px;
+    font-weight: 500;
+    position: relative;
+    
+}
+
+#menuu_movil ul li:last-child {
+    margin-top: 13px;
+}
+
+
+#menuu_movil ul li a {
+    text-decoration: none;
+    text-transform: uppercase;
+    text-align: center;
+}
+
+
+
+
+
+
+
+
+#logo_and_but_menu_respons{
+    display: block;
+    position: absolute; 
+    top: 32px; 
+    width: 100%; 
+    text-align: center;
+    
+}
+
+#butt_menu{
+  color: white;
+  position: absolute;
+  
+  top: 21px;
+  right: 25px;
+  z-index: 1;
+    
+    
+}
+
+
+#menuu_movil ul li {
+    display: block;
+    padding: 17px 0px;
+    }
+
+
+
+
+#buton_pedir_cita_interior {
+    font-size: 18px;
+}
+
+
+
+
+
+
+
+#tabla_citas_cliente_con_cuenta tr td{
+    padding: 17px 25px;
+}
+
+
+
+
+#login_content {
+    width: 353px !important;
+}
+
+
+#registro_content{
+    width: 353px !important;
+}
+
+
+
+
+
+

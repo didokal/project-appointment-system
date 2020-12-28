@@ -1,43 +1,72 @@
 <html lang="en">
+<?php
+session_start();
+
+require_once("config.php");
+$conexion = new mysqli(conexion_host, conexion_user, conexion_pass, conexion_bbdd, conexion_port);
+
+if ($conexion->connect_error) {
+    die("Error conexion bd: " . $conexion->connect_error);
+}
+
+if(!isset($_SESSION["permiso"]) || ($_SESSION["permiso"] != null && $_SESSION["permiso"] != "admin")){
+    die("<h1 style='color:darkslateblue'>Забранен достъп!</h1>");
+}
+if (isset($_GET["exit"])) {
+    salir();
+}
+function salir()
+{
+    unset($_SESSION["permiso"]);
+    unset($_SESSION["user"]);
+    unset($_SESSION["pass"]);
+    session_unset();
+    session_destroy();
+    header('Location: admin-login.html');
+}
+?>
+
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Админ панел - Услуги</title>
     <link rel="stylesheet" href="css/styles.css">
+
+    <!-- js para los iconos fontawesome.com -->
+    <script src="https://kit.fontawesome.com/f2714199ff.js" crossorigin="anonymous"></script>
 </head>
-<body>
-<h1>Menu</h1>
+<body style="margin-top: 22px;">
+<h1>Меню</h1>
 <ul id="temporal_ul">
-    <li><a href="admin-panel.php">Admin panel</a></li>
-    <li><a href="pedir_cita.php">Pedir cita</a></li>
-    <li><a href="empleados.php">Empleados</a></li>
-    <li><a href="categorias.php">Categorias</a></li>
-    <li><a href="servicios.php">Servicios</a></li>
-    <li><a href="calendario_show_appointments.html">Calendario con citas</a></li>
-    <li><a href="clientes.php">Clientes</a></li>
-    <li><a href="citas.php">Citas</a></li>
+    <?php
+    if ($_SESSION["permiso"] == "admin") {
+        echo '<li><a href="empleados.php">Служители</a></li>
+              <li><a href="categorias.php">Категории</a></li>
+              <li><a href="servicios.php">Услуги</a></li>
+              <li><a href="clientes.php">Клиенти</a></li>
+              <li><a href="calendario_show_appointments.php">Календар с резервации</a></li>
+              <li><a href="citas.php">Резервации</a></li>
+              <li><a href="?exit">Изход</a></li>';
+    } else {
+        echo '<li><a href="calendario_show_appointments.php">Календар с резервации</a></li>
+              <li><a href="citas.php">Резервации</a></li>
+              <li><a href="?exit">Изход</a></li>';
+    }
+    ?>
 </ul>
 <hr style="color: #0056b2"/>
-<br><br><br>
-<h1>Servicios</h1>
+<br><br>
+<h1>Услуги</h1>
 <table id="tabla">
     <tr>
-        <th>Nombre</th>
-        <th>Duracion</th>
-        <th>Categoria</th>
+        <th>Име</th>
+        <th>Продължителност</th>
+        <th>Категория</th>
         <th></th>
         <th></th>
     </tr>
 
 
     <?php
-    session_start();
-    $conexion = new mysqli("localhost", "root", "", "citas2", "3306");
-
-    if ($conexion->connect_error) {
-        die("Error conexion bd: " . $conexion->connect_error);
-    }
-
-
     $resultado = mysqli_query($conexion, "SELECT * FROM `servicios`");
     while ($row = mysqli_fetch_array($resultado)) {
         echo "<tr class='trr' id='serv$row[1]'>";
@@ -53,30 +82,27 @@
         echo "<td><input type='checkbox' id='checkbox_borrar'  name='location[]' value='$row[1]'></td>";
         echo "</tr>";
     }
-
-
     ?>
 </table>
 <div style="margin-top: 20px">
-    <button id="buton_borrar"><span class="icon_borrar">  Eliminar servicio</span></button>
-    <button id="buton_anadir"><span class="icon_anadir">  Añadir servicio</span></button>
-
+    <button id="buton_borrar"><i class="fas fa-trash-alt"></i><span>  Изтрий услуга</span></button>
+    <button id="buton_anadir"><i class="fas fa-plus"></i><span>  Добави услуга</span></button>
 </div>
 
 
 <div id="miSlidePanel" class="slidePanel">
     <div class="slidePanel-content">
         <div id="titulo">
-            <h2>Añadir servicio</h2>
+            <h2>Добавяне на услуга</h2>
         </div>
         <span id="alert-text">
-                Nombre servicio:<br><br>
+                Име:<br><br>
                 <input type="text" id="nombre_servicio"><br><br>
 
-                Duracion servicio:<br><br>
+                Продължителност:<br><br>
                 <input type="number" id="duracion_servicio"><br><br>
 
-                Elige categoria:<br><br>
+                Избери категория:<br><br>
                 <select name="categoria_escogida" id="categoria_escogida">
                     <?php
                     $resultado = mysqli_query($conexion, "SELECT * FROM `categorias`");
@@ -88,8 +114,8 @@
             <br>
             </span>
         <div id="alert-footer">
-            <span id="alert_anadir">Añadir</span>
-            <span id="alert_cancelar">Cancelar</span>
+            <span id="alert_anadir">Добави</span>
+            <span id="alert_cancelar">Отмени</span>
         </div>
     </div>
 </div>
@@ -98,16 +124,16 @@
 <div id="miSlidePanel2" class="slidePanel2">
     <div class="slidePanel-content2">
         <div id="titulo">
-            <h2>Actualizar servicio</h2>
+            <h2>Обновяване на услуга</h2>
         </div>
         <span id="alert-text2">
-                Nombre servicio:<br><br>
+                Име:<br><br>
                 <input type="text" id="nombre_servicio2"><br><br>
 
-                Duracion servicio:<br><br>
+                Продължителност:<br><br>
                 <input type="number" id="duracion_servicio2"><br><br>
 
-                Elige categoria:<br><br>
+                Избери категория:<br><br>
                 <select name="categoria_escogida" id="categoria_escogida2">
                     <?php
                     $resultado = mysqli_query($conexion, "SELECT * FROM `categorias`");
@@ -119,8 +145,8 @@
             <br>
             </span>
         <div id="alert-footer">
-            <span id="alert_actualizar2">Actualizar</span>
-            <span id="alert_cancelar2">Cancelar</span>
+            <span id="alert_actualizar2">Обнови</span>
+            <span id="alert_cancelar2">Отмени</span>
         </div>
     </div>
 </div>
@@ -131,8 +157,8 @@
 
         <span id="alert-text5"></span>
         <div id="alert-footer">
-            <span id="alert_actualizar" onclick="alert_back2()">Volver y corregir los datos introducidos</span>
-            <span id="alert_cancelar" onclick="alert_cancel()">Cancelar</span>
+            <span id="alert_actualizar" onclick="alert_back2()">Връщане за поправка на въведените данни</span>
+            <span id="alert_cancelar" onclick="alert_cancel()">Отмени</span>
         </div>
     </div>
 </div>
@@ -142,8 +168,8 @@
 
         <span id="alert-text6"></span>
         <div id="alert-footer">
-            <span id="alert_actualizar" onclick="alert_back3()">Volver y corregir los datos introducidos</span>
-            <span id="alert_cancelar" onclick="alert_cancel()">Cancelar</span>
+            <span id="alert_actualizar" onclick="alert_back3()">Връщане за поправка на въведените данни</span>
+            <span id="alert_cancelar" onclick="alert_cancel()">Отмени</span>
         </div>
     </div>
 </div>
@@ -171,6 +197,7 @@
 
     function alert_cancel() {
         document.getElementById("miAlerta3").style.display = "none";
+        document.getElementById("miAlerta4").style.display = "none";
     }
 
     function alert_back2() {
@@ -209,16 +236,14 @@
                         document.getElementById(servicios_para_borrar[x]).innerHTML = '';
                     }
 
-                    document.getElementById("alert-text4").innerHTML = "La operación ha sido realizada con exito!";
+                    document.getElementById("alert-text4").innerHTML = 'Услугата бе изтрита успешно!';
                     document.getElementById("miAlerta2").style.display = "block";
                 }
             };
             xhttp.open("POST", "ajax2.php?motivo=eliminar_servicio" + "&servicios=" + datos);
             xhttp.send();
-
         }
     });
-
 
     //AÑADIR CATEGORIA
     document.getElementById("buton_anadir").addEventListener("click", function () {
@@ -248,14 +273,17 @@
                 document.getElementById("miSlidePanel").style.display = "none";
 
 
-                if (this.responseText.includes("ERROR")) {
+                if (this.responseText.includes("ГРЕШКА")) {
+                    document.getElementById("alert-text5").innerHTML = this.responseText;
+                    document.getElementById("miAlerta3").style.display = "block";
+                }else if(this.responseText.includes("Не сте попълнили всички полета!")){
                     document.getElementById("alert-text5").innerHTML = this.responseText;
                     document.getElementById("miAlerta3").style.display = "block";
                 } else {
                     var xhttp2 = new XMLHttpRequest();
                     xhttp2.onreadystatechange = function () {
                         if (this.readyState == 4 && this.status == 200) {
-                            document.getElementById("alert-text4").innerHTML = "El servicio ha sido añadido satisfactoriamente";
+                            document.getElementById("alert-text4").innerHTML = "Услугата бе добавена услушно!";
                             document.getElementById("miAlerta2").style.display = "block";
                             document.getElementById("tabla").innerHTML = this.responseText;
                         }
@@ -268,7 +296,6 @@
         xhttp.open("POST", "ajax2.php?motivo=anadir_servicio" + "&servicio=" + servicio + "&duracion=" + duracion + "&categoria=" + categoria);
         xhttp.send();
     });
-
 
     function editar_servicio(servicio) {
         id_servicio = servicio;
@@ -292,7 +319,6 @@
         xhttp.send();
     }
 
-
     document.getElementById("alert_actualizar2").addEventListener("click", function () {
         console.log("SERVICIO QUE VAS A EDITAR >>> " + id_servicio);
         var nombreserv = document.getElementById('nombre_servicio2').value;
@@ -308,11 +334,11 @@
             if (this.readyState == 4 && this.status == 200) {
                 document.getElementById("miSlidePanel2").style.display = "none";
 
-                if (this.responseText.includes("ERROR")) {
+                if (this.responseText.includes("ГРЕШКА")) {
                     document.getElementById("alert-text6").innerHTML = this.responseText;
                     document.getElementById("miAlerta4").style.display = "block";
                 }else{
-                    document.getElementById("alert-text4").innerHTML = "El servicio ha sido actualizado satisfactoriamente";
+                    document.getElementById("alert-text4").innerHTML = "Данните на услугата бяха обновени успешно!";
                     document.getElementById("miAlerta2").style.display = "block";
 
                     document.getElementById("tabla").innerHTML = '';
@@ -323,7 +349,5 @@
         xhttp2.open("POST", "ajax2.php?motivo=actualizar_servicio" + "&nombre_servicio=" + nombreserv + "&duracion_servicio=" + duracionserv + "&categoria_servicio=" + categoriaserv + "&idServicio=" + id_servicio);
         xhttp2.send();
     });
-
-
 </script>
 </body>

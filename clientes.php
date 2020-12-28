@@ -1,62 +1,96 @@
 <html lang="en">
+<?php
+session_start();
+
+require_once("config.php");
+$conexion = new mysqli(conexion_host, conexion_user, conexion_pass, conexion_bbdd, conexion_port);
+
+if ($conexion->connect_error) {
+    die("Error conexion bd: " . $conexion->connect_error);
+}
+
+if(!isset($_SESSION["permiso"]) || ($_SESSION["permiso"] != null && $_SESSION["permiso"] != "admin")){
+    die("<h1 style='color:darkslateblue'>Забранен достъп!</h1>");
+}
+if (isset($_GET["exit"])) {
+    salir();
+}
+function salir()
+{
+    unset($_SESSION["permiso"]);
+    unset($_SESSION["user"]);
+    unset($_SESSION["pass"]);
+    session_unset();
+    session_destroy();
+    header('Location: admin-login.html');
+}
+?>
 <head>
     <meta charset="UTF-8">
-    <title>Clientes</title>
+    <title>Админ панел - Клиенти</title>
     <link rel="stylesheet" href="css/styles.css">
+
+    <!-- js para los iconos fontawesome.com -->
+    <script src="https://kit.fontawesome.com/f2714199ff.js" crossorigin="anonymous"></script>
 </head>
-<body>
-<h1>Menu</h1>
+<body style="margin-top: 22px;">
+<h1>Меню</h1>
 <ul id="temporal_ul">
-    <li><a href="admin-panel.php">Admin panel</a></li>
-    <li><a href="pedir_cita.php">Pedir cita</a></li>
-    <li><a href="empleados.php">Empleados</a></li>
-    <li><a href="categorias.php">Categorias</a></li>
-    <li><a href="servicios.php">Servicios</a></li>
-    <li><a href="calendario_show_appointments.html">Calendario con citas</a></li>
-    <li><a href="clientes.php">Clientes</a></li>
-    <li><a href="citas.php">Citas</a></li>
+    <?php
+    if ($_SESSION["permiso"] == "admin") {
+        echo '<li><a href="empleados.php">Служители</a></li>
+              <li><a href="categorias.php">Категории</a></li>
+              <li><a href="servicios.php">Услуги</a></li>
+              <li><a href="clientes.php">Клиенти</a></li>
+              <li><a href="calendario_show_appointments.php">Календар с резервации</a></li>
+              <li><a href="citas.php">Резервации</a></li>
+              <li><a href="?exit">Изход</a></li>';
+    } else {
+        echo '<li><a href="calendario_show_appointments.php">Календар с резервации</a></li>
+              <li><a href="citas.php">Резервации</a></li>
+              <li><a href="?exit">Изход</a></li>';
+    }
+    ?>
 </ul>
 <hr style="color: #0056b2"/>
-<br><br><br>
+<br><br>
 <div>
-    <h1 style="float: left">Clientes</h1>
+    <h1 style="float: left">Клиенти</h1>
     <div style="float: right; padding-top: 20px;">
         <span style="display: inline-block;">
         <select id="tipo_valor_buscar">
-            <option>Buscar por</option>
-            <option>Nombre</option>
-            <option>Telefono</option>
-            <option>Correo</option>
+            <option>Търсачка</option>
+            <option value="Nombre">Име</option>
+            <option value="Telefono">Телефон</option>
+            <option value="Correo">Имейл адрес</option>
         </select>
             </span>
-        <span style="display: inline-block;"><input type="text" id="buscador" onkeypress="miBuscador()"
+        <span style="display: inline-block;"><input style="font-size: 15px; height: 30px; padding-top: 1px;" type="text" id="buscador" onkeypress="miBuscador()"
                                                     onKeyUp="miBuscador()"></span>
     </div>
 </div>
 <table id="tabla">
     <tr>
-        <th>Nombre</th>
-        <th>Telefono</th>
-        <th>Correo electronico</th>
+        <th>Име</th>
+        <th>Телефон</th>
+        <th>Имейл адрес</th>
+        <th>Парола</th>
         <th></th>
         <th></th>
     </tr>
 
     <?php
-    session_start();
-    $conexion = new mysqli("localhost", "root", "", "citas2", "3306");
-
-    if ($conexion->connect_error) {
-        die("Error conexion bd: " . $conexion->connect_error);
-    }
-
-
     $resultado = mysqli_query($conexion, "SELECT * FROM `clientes`");
     while ($row = mysqli_fetch_array($resultado)) {
         echo "<tr class='trr' id='cliente$row[0]'>";
         echo "<td>$row[1]</td>";
         echo "<td>$row[2]</td>";
         echo "<td>$row[3]</td>";
+        echo "<td>";
+        for($x = 0; $x < strlen($row[4]); $x++){
+            echo "•";
+        }
+        echo "</td>";
 
         echo "<td><button type='button' id='buton_tabla' onclick='editar_cliente(\"$row[0]\")'><i class='button_imagen'></td>";
         echo "<td><input type='checkbox' id='checkbox_borrar'  name='location[]' value='$row[0]|.|$row[2]'></td>";
@@ -65,31 +99,30 @@
     ?>
 </table>
 <div style="margin-top: 20px">
-    <button id="buton_borrar"><span class="icon_borrar">  Eliminar cliente</span></button>
-    <button id="buton_anadir"><span class="icon_anadir">  Añadir cliente</span></button>
-
+    <button id="buton_borrar"><i class="fas fa-trash-alt"></i><span>  Изтрий клиент</span></button>
+    <button id="buton_anadir"><i class="fas fa-plus"></i><span>  Добави клиент</span></button>
 </div>
 
 
 <div id="miSlidePanel" class="slidePanel">
     <div class="slidePanel-content">
         <div id="titulo">
-            <h2>Añadir cliente</h2>
+            <h2>Добавяне на клиент</h2>
         </div>
         <span id="alert-text">
-                Nombre cliente:<br><br>
+                Име:<br><br>
                 <input type="text" id="nombre_cliente"><br><br>
 
-                Telefono:<br><br>
+                Телефон:<br><br>
                 <input type="number" id="telefono_cliente"><br><br>
 
-                Correo electronico:<br><br>
+                Имейл адрес:<br><br>
                 <input type="text" id="correo_electronico_cliente">
             <br>
         </span>
         <div id="alert-footer">
-            <span id="alert_anadir">Añadir</span>
-            <span id="alert_cancelar">Cancelar</span>
+            <span id="alert_anadir">Добави</span>
+            <span id="alert_cancelar">Отмени</span>
         </div>
     </div>
 </div>
@@ -98,22 +131,22 @@
 <div id="miSlidePanel2" class="slidePanel2">
     <div class="slidePanel-content2">
         <div id="titulo">
-            <h2>Actualizar cliente</h2>
+            <h2>Реадктиране на профил</h2>
         </div>
         <span id="alert-text2">
-                Nombre servicio:<br><br>
+                Име:<br><br>
                 <input type="text" id="nombre_cliente2"><br><br>
 
-                Telefono:<br><br>
+                Телефон:<br><br>
                 <input type="number" id="telefono_cliente2"><br><br>
 
-                Correo electronico:<br><br>
+                Имейл адрес:<br><br>
                 <input type="text" id="correo_electronico_cliente2">
             <br>
         </span>
         <div id="alert-footer">
-            <span id="alert_actualizar2">Actualizar</span>
-            <span id="alert_cancelar2">Cancelar</span>
+            <span id="alert_actualizar2">Обнови</span>
+            <span id="alert_cancelar2">Отмени</span>
         </div>
     </div>
 </div>
@@ -124,8 +157,8 @@
 
         <span id="alert-text3"></span>
         <div id="alert-footer">
-            <span id="alert_actualizar" onclick="alert_update()">Actualizar</span>
-            <span id="alert_cancelar" onclick="alert_cancel()">Cancelar</span>
+            <span id="alert_actualizar" onclick="alert_update()">Обнови</span>
+            <span id="alert_cancelar" onclick="alert_cancel()">Отмени</span>
         </div>
     </div>
 </div>
@@ -135,8 +168,8 @@
     <div class="alerta-content">
         <span id="alert-text6"></span>
         <div id="alert-footer">
-            <span id="alert_actualizar" onclick="alert_back3()">Volver y corregir los datos introducidos</span>
-            <span id="alert_cancelar" onclick="alert_cancel()">Cancelar</span>
+            <span id="alert_actualizar" onclick="alert_back3()">Връщане за коригиране на въведените данни</span>
+            <span id="alert_cancelar" onclick="alert_cancel()">Отмени</span>
         </div>
     </div>
 </div>
@@ -146,8 +179,8 @@
     <div class="alerta-content">
         <span id="alert-text7"></span>
         <div id="alert-footer">
-            <span id="alert_actualizar" onclick="alert_back7()">Volver y corregir los datos introducidos</span>
-            <span id="alert_cancelar" onclick="alert_cancel()">Cancelar</span>
+            <span id="alert_actualizar" onclick="alert_back7()">Връщане за коригиране на въведените данни</span>
+            <span id="alert_cancelar" onclick="alert_cancel()">Отмени</span>
         </div>
     </div>
 </div>
@@ -171,13 +204,15 @@
 
 
     //BUSCADOR
-    var tipo_valor_a_buscar_escogido;
+    var tipo_valor_a_buscar_escogido = '';
 
     var select = document.querySelector('#tipo_valor_buscar'),
         input = document.querySelector('input[type="button"]');
     select.addEventListener('change', function () {
-        tipo_valor_a_buscar_escogido = document.getElementById("tipo_valor_buscar").value
+        tipo_valor_a_buscar_escogido = document.getElementById("tipo_valor_buscar").value;
     });
+
+
 
     function miBuscador() {
         var edValue = document.getElementById("buscador");
@@ -192,7 +227,7 @@
                     document.getElementById("tabla").innerHTML = '';
                     document.getElementById("tabla").innerHTML = this.responseText;
                 } else {
-                    document.getElementById("tabla").innerHTML = 'Sin resultados';
+                    document.getElementById("tabla").innerHTML = 'Без резултати!';
                 }
             }
         };
@@ -220,7 +255,7 @@
                 document.getElementById("tabla").innerHTML = '';
                 document.getElementById("tabla").innerHTML = this.responseText;
 
-                document.getElementById("alert-text4").innerHTML = "Los datos del usuario con telefono " + telefonocliente + " se actualizarón correctamente!";
+                document.getElementById("alert-text4").innerHTML = "Потребителските данни на клиента с телефон " + telefonocliente + " бяха обновени успешно!";
                 document.getElementById("miAlerta2").style.display = "block";
             }
         };
@@ -231,6 +266,8 @@
 
     function alert_cancel() {
         document.getElementById("miAlerta").style.display = "none";
+        document.getElementById("miAlerta4").style.display = "none";
+        document.getElementById("miAlerta7").style.display = "none";
     }
 
     function alert_back3() {
@@ -280,7 +317,7 @@
         xhttp.open("POST", "ajax2.php?motivo=eliminar_cliente" + "&clientes=" + valParam);
         xhttp.send();
 
-        document.getElementById("alert-text4").innerHTML = "La operación ha sido realizada con exito!";
+        document.getElementById("alert-text4").innerHTML = "Клиентът бе изтрит успешно!";
         document.getElementById("miAlerta2").style.display = "block";
     });
 
@@ -311,17 +348,21 @@
             if (this.readyState == 4 && this.status == 200) {
                 console.log(this.responseText);
 
-                if (this.responseText.includes("Su telefono")) {
+                if (this.responseText.includes("Въведеният телефон")) {
                     document.getElementById("miSlidePanel").style.display = "none";
                     document.getElementById("alert-text3").innerHTML = this.responseText;
                     document.getElementById("miAlerta").style.display = "block";
-                } else if(this.responseText.includes("Ya existe un usuario")){
+                } else if(this.responseText.includes("Вече съществува клиент")) {
+                    document.getElementById("miSlidePanel").style.display = "none";
+                    document.getElementById("alert-text7").innerHTML = this.responseText;
+                    document.getElementById("miAlerta7").style.display = "block";
+                }else if(this.responseText.includes("Не сте попълнили всички полета")){
                     document.getElementById("miSlidePanel").style.display = "none";
                     document.getElementById("alert-text7").innerHTML = this.responseText;
                     document.getElementById("miAlerta7").style.display = "block";
                 }else {
                     document.getElementById("miSlidePanel").style.display = "none";
-                    document.getElementById("alert-text4").innerHTML = "El cliente ha sido creado satisfactoriamente!";
+                    document.getElementById("alert-text4").innerHTML = "Клиентът бе добавен услушно!";
                     document.getElementById("miAlerta2").style.display = "block";
 
                     var xhttp2 = new XMLHttpRequest();
@@ -377,11 +418,11 @@
             if (this.readyState == 4 && this.status == 200) {
                 document.getElementById("miSlidePanel2").style.display = "none";
 
-                if (this.responseText.includes("ERROR")) {
+                if (this.responseText.includes("ГРЕШКА")) {
                     document.getElementById("alert-text6").innerHTML = this.responseText;
                     document.getElementById("miAlerta4").style.display = "block";
                 } else {
-                    document.getElementById("alert-text4").innerHTML = "Los datos del cliente se actualizarón satisfactoriamente!";
+                    document.getElementById("alert-text4").innerHTML = "Данните на клиента бяха обновени успешно!";
                     document.getElementById("miAlerta2").style.display = "block";
 
                     document.getElementById("tabla").innerHTML = '';

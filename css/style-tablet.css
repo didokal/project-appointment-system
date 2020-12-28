@@ -1,0 +1,175 @@
+.buton_pedir_cita {
+    position: absolute;
+    top: 340px;
+    width: 100%;
+    text-align: center;
+}
+
+
+.home_page_img {
+    width: 100%;
+    height: 660px;
+    object-fit: cover;
+    display: block;
+    background-color: #04081d;
+}
+
+
+
+
+#historia {
+    margin: 0 auto;
+    padding: 50px;
+    max-width: 750px;
+}
+
+
+#servicioss {
+    margin: 0 auto;
+    padding: 50px;
+    max-width: 750px;
+}
+
+
+#pedir-cita {
+    max-width: 750px;
+    margin: 0 auto;
+    padding: 50px;
+}
+
+#content #left {
+    width: 39%  !important;
+    float: left;
+    margin-bottom: 38px;
+}
+
+#content #right {
+    width: 56%  !important;
+    float: right;
+    margin-bottom: 15px;
+}
+
+#contenedor1, #contenedor2, #contenedor3, #contenedor4 {
+    max-width: 100%;
+    max-width: 840px;
+    height: 670px !important;
+    padding: 30px 30px 10px;
+    box-shadow: 2px 2px 25px 5px #f0f0f0;
+    border-radius: 15px;
+    background: #fff;
+    margin: auto;
+}
+
+
+
+
+
+
+
+#contactoss {
+    max-width: 750px;
+    margin: 0 auto;
+    padding: 50px;
+}
+
+
+#menuu {
+    display: none
+}
+
+
+#menuu_movil{
+  display: none;
+    background-color: #1e2022;
+    position: absolute;
+    width: 80%;
+    height: 100%;
+    box-shadow: 0 0 10px black;
+    margin: -30px 0 0 70%;
+    padding: 30px;
+    padding-top: 54px;
+    -webkit-font-smoothing: antialiased;
+    transform-origin: 0% 0%;
+    transform: translate(-100%, 0);
+    transition: transform 0.5s cubic-bezier(0.77,0.2,0.05,1.0);
+    z-index: 20;
+}
+
+
+
+#menuu_movil ul {
+    list-style: none;
+    text-align: center;
+    margin-left: 18px;
+}
+
+
+#menuu_movil ul li {
+    display: inline-block;
+    color: white;
+    padding: 0 25px;
+    font-weight: 500;
+    position: relative;
+    
+}
+
+#menuu_movil ul li:last-child {
+    margin-top: 13px;
+}
+
+
+#menuu_movil ul li a {
+    text-decoration: none;
+    text-transform: uppercase;
+    text-align: center;
+}
+
+
+
+
+
+
+
+
+#logo_and_but_menu_respons{
+    display: block;
+    position: absolute; 
+    top: 32px; 
+    width: 100%; 
+    text-align: center;
+    
+}
+
+#butt_menu{
+  color: white;
+  position: absolute;
+  
+  top: 25px;
+  right: 25px;
+  z-index: 1;
+    
+    
+}
+
+
+#menuu_movil ul li {
+    display: block;
+    padding: 17px 0px;
+    }
+
+
+
+
+#buton_pedir_cita_interior {
+    font-size: 18px;
+}
+
+
+
+
+
+
+
+#tabla_citas_cliente_con_cuenta tr td{
+    padding: 17px 25px;
+}

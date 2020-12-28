@@ -1,7 +1,8 @@
 <script>
 
     function diaSemana(dia,mes,anio){
-        var dias=["Domingo", "Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado"];
+        //var dias=["Domingo", "Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado"];
+        var dias=["Неделя", "Понеделник", "Вторник", "Сряда", "Четвъртък", "Петък", "Събота"];
         var dt = new Date(mes+' '+dia+', '+anio+' 12:00:00');
         //document.getElementById('div1').innerHTML = "Dia de la semana : " + dias[dt.getUTCDay()];
 
@@ -14,52 +15,76 @@
         var mes = document.getElementById("month").innerHTML;
         var anio = document.getElementById("year").innerHTML;
 
+        //quitar el color de fondo cuando hacemos clieck sobre una fecha
+        var numEleme = document.getElementsByClassName("asd2");
+        for(b = 0; b < numEleme.length; b++) {
+            numEleme[b].style.backgroundColor = "transparent";
+        }
+
+
+
+        //poner color de fondo cuando hacemos click sobre una fecha
+        var x = document.getElementsByClassName("asd2");
+
+        for(a = 0; a < x.length; a++) {
+            if (x[a].textContent == dia) {
+                x[a].style.borderRadius = "99%";
+                x[a].style.color = "blue";
+                x[a].style.backgroundColor = "#b34f00";
+            }
+        }
+
         console.log(mes);
         console.log(anio);
         console.log(dia);
 
         var mes_numero = 0;
         var mes_en_ingles = "";
-        if(mes == "Enero"){
+        if(mes == "Януари"){
             mes_en_ingles = "January"
             mes_numero = 1;
-        }else if(mes == "Febrero"){
+        }else if(mes == "Февруари"){
             mes_en_ingles = "February"
             mes_numero = 2;
-        }else if(mes == "Marzo"){
+        }else if(mes == "Март"){
             mes_en_ingles = "March"
             mes_numero = 3;
-        }else if(mes == "Abril"){
+        }else if(mes == "Април"){
             mes_en_ingles = "April"
             mes_numero = 4;
-        }else if(mes == "Mayo"){
+        }else if(mes == "Май"){
             mes_en_ingles = "May"
             mes_numero = 5;
-        }else if(mes == "Junio"){
+        }else if(mes == "Юни"){
             mes_en_ingles = "June"
             mes_numero = 6;
-        }else if(mes == "Julio"){
+        }else if(mes == "Юли"){
             mes_en_ingles = "July"
             mes_numero = 7;
-        }else if(mes == "Agosto"){
+        }else if(mes == "Август"){
             mes_en_ingles = "August"
             mes_numero = 8;
-        }else if(mes == "Septiembre"){
+        }else if(mes == "Септември"){
             mes_en_ingles = "September"
             mes_numero = 9;
-        }else if(mes == "Octubre"){
+        }else if(mes == "Октомври"){
             mes_en_ingles = "October"
             mes_numero = 10;
-        }else if(mes == "Noviembre"){
+        }else if(mes == "Ноември"){
             mes_en_ingles = "November"
             mes_numero = 11;
-        }else if(mes == "Diciembre"){
+        }else if(mes == "Декември"){
             mes_en_ingles = "December"
             mes_numero = 12;
         }
 
-        document.cookie = "fecha=" + anio + "-" + mes_numero + "-" + dia;
-        document.cookie = "diaSemana=" + diaSemana(dia, mes_en_ingles, anio);
+        var now = new Date();
+        var time = now.getTime();
+        time += 360 * 1000;
+        now.setTime(time);
+
+        document.cookie = "fecha=" + anio + "-" + mes_numero + "-" + dia + '; expires=' + now.toUTCString();
+        document.cookie = "diaSemana=" + diaSemana(dia, mes_en_ingles, anio) + '; expires=' + now.toUTCString();
     }
 </script>
 
@@ -81,40 +106,40 @@ list($sMonthName, $iDaysInMonth) = explode('-', date('F-t', $iTimestamp));
 
 switch ($sMonthName){
     case "January" :
-        $sMonthName = "Enero";
+        $sMonthName = "Януари";
         break;
     case "February" :
-        $sMonthName = "Febrero";
+        $sMonthName = "Февруари";
         break;
     case "March" :
-        $sMonthName = "Marzo";
+        $sMonthName = "Март";
         break;
     case "April" :
-        $sMonthName = "Abril";
+        $sMonthName = "Април";
         break;
     case "May" :
-        $sMonthName = "Mayo";
+        $sMonthName = "Май";
         break;
     case "June" :
-        $sMonthName = "Junio";
+        $sMonthName = "Юни";
         break;
     case "July" :
-        $sMonthName = "Julio";
+        $sMonthName = "Юли";
         break;
     case "August" :
-        $sMonthName = "Agosto";
+        $sMonthName = "Август";
         break;
     case "September":
-        $sMonthName = "Semptiembre";
+        $sMonthName = "Септември";
         break;
     case "October":
-        $sMonthName = "Octubre";
+        $sMonthName = "Октомври";
         break;
     case "November" :
-        $sMonthName = "Noviembre";
+        $sMonthName = "Ноември";
         break;
     case "December" :
-        $sMonthName = "Diciembre";
+        $sMonthName = "Декември";
         break;
 }
 
@@ -176,13 +201,13 @@ for ($i = 0; $i < 6; $i++) { // 6-weeks range
             //si estamos en el dia 9 del mes de noviembre no queremos que los dias anterior de este mes sean seleccionables
             if ($iCurrentDay < $iNowDay && $iNowYear == $iYear && $iNowMonth == $iMonth){
                 echo "<script>console.log($iCurrentDay)</script>";
-                $sCalTblRows .= '<td id="asd" class="actualMonthPastDays" value="'.$iCurrentDay.'"><a href="javascript: void(0)">'.$iCurrentDay.'</a></td>';
+                $sCalTblRows .= '<td class="asd" id="actualMonthPastDays" value="'.$iCurrentDay.'"><a href="javascript: void(0)">'.$iCurrentDay.'</a></td>';
             }else{
-                $sCalTblRows .= '<td id="asd" onclick="dosomething(this.innerText)" class="'.$sClass.'" value="'.$iNowDay.'"><a href="javascript: void(0)">'.$iCurrentDay.'</a></td>';
+                $sCalTblRows .= '<td class="asd2" onclick="dosomething(this.innerText)" id="'.$sClass.'" value="'.$iNowDay.'"><a href="javascript: void(0)">'.$iCurrentDay.'</a></td>';
             }
 
         }else{
-            $sCalTblRows .= '<td id="asd" class="'.$sClass.'" value="'.$iCurrentDay.'"><a href="javascript: void(0)">'.$iCurrentDay.'</a></td>';
+            $sCalTblRows .= '<td class="asd" id="'.$sClass.'" value="'.$iCurrentDay.'"><a href="javascript: void(0)">'.$iCurrentDay.'</a></td>';
         }
 
 

@@ -1,40 +1,67 @@
 <html lang="en">
+<?php
+session_start();
+
+require_once("config.php");
+$conexion = new mysqli(conexion_host, conexion_user, conexion_pass, conexion_bbdd, conexion_port);
+
+if ($conexion->connect_error) {
+    die("Error conexion bd: " . $conexion->connect_error);
+}
+
+if(!isset($_SESSION["permiso"]) || ($_SESSION["permiso"] != null && $_SESSION["permiso"] != "admin")){
+    die("<h1 style='color:darkslateblue'>Забранен достъп!</h1>");
+}
+if (isset($_GET["exit"])) {
+    salir();
+}
+function salir()
+{
+    unset($_SESSION["permiso"]);
+    unset($_SESSION["user"]);
+    unset($_SESSION["pass"]);
+    session_unset();
+    session_destroy();
+    header('Location: admin-login.html');
+}
+?>
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Админ панел - Категории</title>
     <link rel="stylesheet" href="css/styles.css">
+
+    <!-- js para los iconos fontawesome.com -->
+    <script src="https://kit.fontawesome.com/f2714199ff.js" crossorigin="anonymous"></script>
 </head>
-<body>
+<body style="margin-top: 22px;">
 <div>
-    <h1>Menu</h1>
+    <h1>Меню</h1>
     <ul id="temporal_ul">
-        <li><a href="admin-panel.php">Admin panel</a></li>
-        <li><a href="pedir_cita.php">Pedir cita</a></li>
-        <li><a href="empleados.php">Empleados</a></li>
-        <li><a href="categorias.php">Categorias</a></li>
-        <li><a href="servicios.php">Servicios</a></li>
-        <li><a href="calendario_show_appointments.html">Calendario con citas</a></li>
-        <li><a href="clientes.php">Clientes</a></li>
-        <li><a href="citas.php">Citas</a></li>
+        <?php
+        if ($_SESSION["permiso"] == "admin") {
+            echo '<li><a href="empleados.php">Служители</a></li>
+              <li><a href="categorias.php">Категории</a></li>
+              <li><a href="servicios.php">Услуги</a></li>
+              <li><a href="clientes.php">Клиенти</a></li>
+              <li><a href="calendario_show_appointments.php">Календар с резервации</a></li>
+              <li><a href="citas.php">Резервации</a></li>
+              <li><a href="?exit">Изход</a></li>';
+        } else {
+            echo '<li><a href="calendario_show_appointments.php">Календар с резервации</a></li>
+              <li><a href="citas.php">Резервации</a></li>
+              <li><a href="?exit">Изход</a></li>';
+        }
+        ?>
     </ul>
     <hr style="color: #0056b2"/>
-    <br><br><br>
-
-
-    <h1>Categorias</h1>
+    <br><br>
+    <h1>Категории</h1>
     <table id="tabla">
         <tr>
-            <th>Nombre</th>
+            <th>Име</th>
             <th></th>
         </tr>
         <?php
-        session_start();
-        $conexion = new mysqli("localhost", "root", "", "citas2", "3306");
-
-        if ($conexion->connect_error) {
-            die("Error conexion bd: " . $conexion->connect_error);
-        }
-
         $resultado = mysqli_query($conexion, "SELECT * FROM `categorias`");
         while ($row = mysqli_fetch_array($resultado)) {
             echo "<tr class='trr' id='cat$row[0]'>";
@@ -45,24 +72,23 @@
         ?>
     </table>
     <div style="margin-top: 20px">
-        <button id="buton_borrar"><span class="icon_borrar">  Eliminar categoria</span></button>
-        <button id="buton_anadir"><span class="icon_anadir">  Añadir categoria</span></button>
-
+        <button id="buton_borrar"><i class="fas fa-trash-alt"></i><span>  Изтрий категория</span></button>
+        <button id="buton_anadir"><i class="fas fa-plus"></i><span>  Добави категория</span></button>
     </div>
 
 
     <div id="miAlerta" class="alerta">
         <div class="alerta-content2">
             <div id="titulo">
-                <h2>Añadir categoria</h2>
+                <h2>Добавяне на категория</h2>
             </div>
             <span id="alert-text">
-                Nombre categoria:<br><br>
+                Име на категория:<br><br>
                 <input type="text" id="categoria">
             </span>
             <div id="alert-footer">
-                <span id="alert_anadir">Añadir</span>
-                <span id="alert_cancelar">Cancelar</span>
+                <span id="alert_anadir">Добави</span>
+                <span id="alert_cancelar">Отмени</span>
             </div>
         </div>
     </div>
@@ -73,8 +99,8 @@
 
             <span id="alert-text5"></span>
             <div id="alert-footer">
-                <span id="alert_actualizar" onclick="alert_back2()">Volver y corregir los datos introducidos</span>
-                <span id="alert_cancelar" onclick="alert_cancel()">Cancelar</span>
+                <span id="alert_actualizar" onclick="alert_back2()">Връщане за коригиране на въведените данни</span>
+                <span id="alert_cancelar" onclick="alert_cancel()">Отмени</span>
             </div>
         </div>
     </div>
@@ -129,7 +155,7 @@
                         for (var x = 0; x < categoria_para_borrar.length; x++) {
                             document.getElementById(categoria_para_borrar[x]).innerHTML = '';
                         }
-                        document.getElementById("alert-text4").innerHTML = "La operación ha sido realizada con exito!";
+                        document.getElementById("alert-text4").innerHTML = 'Категорията бе изтрита услушно!';
                         document.getElementById("miAlerta2").style.display = "block";
                     }
                 };
@@ -158,8 +184,11 @@
                 if (this.readyState == 4 && this.status == 200) {
                     document.getElementById("miAlerta").style.display = "none";
 
-                    if (this.responseText.includes("ERROR")) {
+                    if (this.responseText.includes("ГРЕШКА")) {
                         document.getElementById("alert-text5").innerHTML = this.responseText;
+                        document.getElementById("miAlerta3").style.display = "block";
+                    }else if(this.responseText.includes("Не сте попълнили всички полета")){
+                        document.getElementById("alert-text5").innerHTML = "Не сте попълнили всички полета!";
                         document.getElementById("miAlerta3").style.display = "block";
                     } else {
                         var xhttp2 = new XMLHttpRequest();
@@ -167,7 +196,7 @@
                             if (this.readyState == 4 && this.status == 200) {
                                 document.getElementById("tabla").innerHTML = this.responseText;
 
-                                document.getElementById("alert-text4").innerHTML = "La categoria ha sido añadida con satisfaccion!";
+                                document.getElementById("alert-text4").innerHTML = "Категорията бе добавена успешно!";
                                 document.getElementById("miAlerta2").style.display = "block";
                             }
                         };
@@ -180,6 +209,5 @@
             xhttp.send();
         });
     </script>
-
 </div>
 </body>

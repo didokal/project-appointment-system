@@ -1,21 +1,20 @@
 <?php
-session_start();
-$conexion = new mysqli("localhost", "root", "", "citas2", "3306");
+require_once("config.php");
+$conexion = new mysqli(conexion_host, conexion_user, conexion_pass, conexion_bbdd, conexion_port);
 
 if ($conexion->connect_error) {
     die("Error conexion bd: " . $conexion->connect_error);
 }
-
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Pedir cita</title>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/styles-calendar.css">
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/alertifyjs@1.11.0/build/css/alertify.min.css" rel="stylesheet"/>
+	<script src="https://cdn.jsdelivr.net/npm/alertifyjs@1.11.0/build/alertify.min.js"></script>
     <script>
         //metodo que me devuelve el valor de una cookie
         function getCookie(nombreCookie) {
@@ -34,64 +33,88 @@ if ($conexion->connect_error) {
 
         //metodos que me guardan los valores en cookies que usasare para hacer la select final
         function guardar_valor_cookies(valor_a_guardar) {
-            if (valor_a_guardar == "servicio") {
+            var now = new Date();
+            var time = now.getTime();
+            time += 360 * 1000;
+            now.setTime(time);
+
+            if (valor_a_guardar === "servicio") {
                 asd = document.getElementById("servicio").value;
-                document.cookie = "servicio" + "=" + asd;
-            } else if (valor_a_guardar == "empleado") {
+                document.cookie = "servicio" + "=" + asd + '; expires=' + now.toUTCString();
+            } else if (valor_a_guardar === "empleado") {
                 asd2 = document.getElementById("empleado").value;
-                document.cookie = "empleado" + "=" + asd2;
-
-                //document.cookie = "fecha=2019-12-01";
-
-            } else if (valor_a_guardar == "fecha") {
+                document.cookie = "empleado" + "=" + asd2 + '; expires=' + now.toUTCString();
+            } else if (valor_a_guardar === "fecha") {
                 //document.cookie = "fecha=2019-12-01";     por ahora lo dejamos asi pero cuando pongo el calendario aqui se guardara la fecha
             }
         }
 
 
         function guardar_valor_cookie_hora(valor) {
-            document.cookie = "hora" + "=" + valor;
+				var now = new Date();
+                var time = now.getTime();
+                time += 360 * 1000;
+                now.setTime(time);
+			
+                document.cookie = "hora" + "=" + valor + '; expires=' + now.toUTCString();
         }
 
         function alert_cancel() {
             document.getElementById("miAlerta").style.display = "none";
         }
+        
+                    //comprueba si todos los campos estan rellenados para sacar alerta o saltar a la siguiuente pantalla
+            function comprobar_datos(num_contenedor) {
 
+                if (num_contenedor === "contenedor1") {
+                    if (getCookie('servicio') === "" || getCookie('empleado') === "" || getCookie('fecha') === "") {
+
+                        document.getElementById("alert-text4").innerHTML =
+                                "<h4>За да направите резервация трябва да попълните всички полета!</h4>";
+                        document.getElementById("miAlerta2").style.display = "block";
+                    } else {
+                        show(2);
+                        seleccionar_hora(2);
+                        window.location="#pedir-cita";
+                    }
+                }
+            }
+
+            function alert_ok() {
+                document.getElementById("miAlerta2").style.display = "none";
+            }
     </script>
 </head>
 <body>
-<h1>Menu</h1>
-<ul id="temporal_ul">
-    <li><a href="admin-panel.php">Admin panel</a></li>
-    <li><a href="pedir_cita.php">Pedir cita</a></li>
-    <li><a href="empleados.php">Empleados</a></li>
-    <li><a href="categorias.php">Categorias</a></li>
-    <li><a href="servicios.php">Servicios</a></li>
-    <li><a href="calendario_show_appointments.html">Calendario con citas</a></li>
-    <li><a href="clientes.php">Clientes</a></li>
-    <li><a href="citas.php">Citas</a></li>
-</ul>
-<hr style="color: #0056b2"/>
-<br><br><br>
-<h1>Haz tu reserva ahora</h1>
+<div id="miAlerta2" class="alerta">
+    <div class="alerta-content">
 
+        <span id="alert-text4"></span>
+        <div id="alert-footer">
+            <span id="alert_ok2" onclick="alert_ok()">OK</span>
+        </div>
+    </div>
+</div>
+    
+    
+    
 <div id="contenedor1" style="display: block">
     <div id="estados">
         <ul class="bookme-pro-steps">
-            <li class="bookme-pro-steps-is-active">Servicio</li>
-            <li>Hora</li>
-            <li>Datos</li>
-            <li>Fin</li>
+            <li class="bookme-pro-steps-is-active">Услуга</li>
+            <li>Час</li>
+            <li>Данни</li>
+            <li>Край</li>
         </ul>
     </div>
     <div id="content">
-        <h3>Porfavor rellena todos los campos:</h3>
+        <h4>Моля, попълнете всички задължителни полета, отбелязани със звездичка (*).</h4>
         <div id="left">
             <div>
                 <!-- GENERAMOS CATEGORIAS -->
-                Categoria:<br><br>
+                <h5>Категория: *</h5>
                 <select id="categoria" name="categoria_escogida" onchange="sacar_servicios_por_categoria(1)">
-                    <option>Selecciona una categoria</option>
+                    <option>Изберете категория</option>
 
                     <?php
                     $resultado = mysqli_query($conexion, "SELECT * FROM `categorias`");
@@ -122,11 +145,11 @@ if ($conexion->connect_error) {
                 </script>
 
                 <!-- Aqui se mostraran todos los servicios de la categoria que hemos seleccionado -->
-                Servicios:<br><br>
+                <h5>Услуга: *</h5>
                 <div id="servicios"></div>
                 <select id="servicio" name="categoria_escogida"
                         onchange="sacar_empleados_por_servicio(1), guardar_valor_cookies('servicio')">
-                    <option>Selecciona un servicio</option>
+                    <option>Изберете услуга</option>
                 </select>
             </div>
 
@@ -149,42 +172,41 @@ if ($conexion->connect_error) {
 
 
             <div>
-                <br><br>Empleado:<br><br>
+                <br><br><h5>Механик: *</h5>
                 <div id="empleados"></div>
                 <select id="empleado" onchange="guardar_valor_cookies('empleado')">
-                    <option>Selecciona un empleado</option>
+                    <option>Изберете механик</option>
                 </select>
             </div>
         </div>
         <div id="right">
-            Selecciona una fecha:
+            <h5>Дата: *</h5>
             <?php
-            echo "asd";
-
-
             $file = file_get_contents('calendario_make_appointment.php');
             $content = eval("?>$file");
             echo $content;
-
-
             ?>
         </div>
+        <div class="clear"></div>
+        <div id="separador"></div>
+        <span id="aviso" style="display: inline-block"></span>
+        <button id="buton_siguiente" onclick="comprobar_datos('contenedor1')">Напред</button>
     </div>
-    <button id="buton" onclick="show(2); seleccionar_hora(2)">Sigueinte</button>
+
 </div>
 
 
 <div id="contenedor2" style="display: none">
     <div id="estados">
         <ul class="bookme-pro-steps">
-            <li>Servicio</li>
-            <li class="bookme-pro-steps-is-active">Hora</li>
-            <li>Datos</li>
-            <li>Fin</li>
+            <li>Услуга</li>
+            <li class="bookme-pro-steps-is-active">Час</li>
+            <li>Данни</li>
+            <li>Край</li>
         </ul>
     </div>
     <div id="content">
-        <h3>Selleciona una hora</h3>
+        <h4>Изберете удобен час</h4>
 
         <div id='scroll-content'></div>
 
@@ -203,7 +225,7 @@ if ($conexion->connect_error) {
 
                         var fecha_partida = getCookie('fecha').split('-');
 
-                        document.getElementById('diaSeleccionado').innerHTML = getCookie('diaSemana') + ", " + fecha_partida[2] + " de " + document.getElementById("month").innerText;
+                        document.getElementById('diaSeleccionado').innerHTML = getCookie('diaSemana') + ", " + fecha_partida[2] + " " + document.getElementById("month").innerText;
                     }
                 };
                 xhttp.open("POST", "ajax.php?pagg=" + pagina + "&fecha=" + getCookie('fecha') + "&empleado=" + getCookie('empleado') + "&servicio=" + getCookie('servicio') + "&diaSemana=" + getCookie('diaSemana'), true);
@@ -212,140 +234,163 @@ if ($conexion->connect_error) {
 
         </script>
 
+        <div class="clear"></div>
+        <div id="separador"></div>
+        <button id="buton_atras" onclick="show(1)">Назад</button>
+        <!--<button id="buton_siguiente" onclick="comprobar_datos('contenedor1')">Напред</button>-->
     </div>
-    <button id="buton" onclick="show(1)">Atras</button>
-    <button id="buton" onclick="show(3)">Sigueinte</button>
 </div>
 
 
 <div id="contenedor3" style="display: none">
     <div id="estados">
         <ul class="bookme-pro-steps">
-            <li>Servicio</li>
-            <li>Hora</li>
-            <li class="bookme-pro-steps-is-active">Datos</li>
-            <li>Fin</li>
+            <li>Услуга</li>
+            <li>Час</li>
+            <li class="bookme-pro-steps-is-active">Данни</li>
+            <li>Край</li>
         </ul>
     </div>
     <div id="content">
-        <h3 id="rellena">Porfavor rellena todos los campos:</h3>
+        <h4 id="rellena">Моля, попълнете всички задължителни полета, отбелязани със звездичка (*).</h4>
 
         <div id="left">
-            Nombre:<br><br>
-            <input type="text" name="nombre" id="nombre"><br><br>
+            <h5>Вашето име: *</h5>
+            <input type="text" name="nombre" id="nombre" placeholder="Вашето име"><br>
 
-            Telefono:<br><br>
-            <input type="number" name="telefono" id="telefono"><br><br>
+            <h5>Вашият телефон: *</h5>
+            <input type="text" name="telefono" id="telefono" placeholder="Вашият телефон"><br>
 
-            Correo electronico:<br><br>
-            <input type="email" name="correo" id="correo"><br><br>
+            <h5>Вашият имайл адрес: *</h5>
+            <input type="email" name="correo" id="correo" placeholder="Вашият телефон"><br>
 
-            Nota:<br><br>
-            <input type="nota" name="nota" id="nota"><br><br>
+            <h5>Бележка:</h5>
+            <input type="nota" name="nota" id="nota" placeholder="При желание опишете повредата"><br>
         </div>
-        <div id="right">
-            Servicio seleccionado, empleado, dia, hora
+        <div id="right2">
+            <h5>Въведени данни:</h5>
+            <span>Услуга: </span><span id="datos_elegidos_servicio"></span><br>
+            <span>Механик: </span><span id="datos_elegidos_empleado"></span><br>
+            <span>Дата: </span><span id="datos_elegidos_fecha"></span><br>
+            <span>Час: </span><span id="datos_elegidos_hora"></span><br>
         </div>
-    </div>
 
 
-    <script>
-        //una vez que escogemos la categoria carga este script, el script mandra mediante ajax la categoria, se hace una select de todos los servicios bajo esa categoria y se muestran
-        function datos_cliente(pagina) {
-            nombre = document.getElementById('nombre');
-            console.log(nombre.value);
+        <script>
+            function datos_cliente(pagina) {
+                nombre = document.getElementById('nombre');
+                console.log(nombre.value);
 
-            correo = document.getElementById('correo');
-            console.log(correo.value);
+                correo = document.getElementById('correo');
+                console.log(correo.value);
 
-            nota = document.getElementById('nota');
-            console.log(nota.value);
+                nota = document.getElementById('nota');
+                console.log(nota.value);
 
-            var xhttp = new XMLHttpRequest();
-            xhttp.onreadystatechange = function () {
-                if (this.readyState == 4 && this.status == 200) {
-                    console.log(this.responseText);
+                var xhttp = new XMLHttpRequest();
+                xhttp.onreadystatechange = function () {
+                    if (this.readyState == 4 && this.status == 200) {
+                        console.log(this.responseText);
 
-                    //sacamos una alerta si se han metido datos que no concuerdan con el telefono
-                    if (this.responseText.includes("telefono")) {
-                        //agregamos el texto al id
-                        document.getElementById("alert-text").innerHTML = this.responseText;
-                        //mostramos la alerta
-                        document.getElementById("miAlerta").style.display = "block";
-                    } else {
-                        //si el cliente no existe añadimos el texto que viene del ajax y sacamos la cuarta pantalla
-                        document.getElementById("datos_cliente").innerHTML = this.responseText;
-                        show(4);
+                        //sacamos una alerta si se han metido datos que no concuerdan con el telefono
+                        if (this.responseText.includes("Вашият телефонен номер")) {
+                            //agregamos el texto al id
+                            document.getElementById("alert-text").innerHTML = this.responseText;
+                            //mostramos la alerta
+                            document.getElementById("miAlerta").style.display = "block";
+                        } else {
+                            //si el cliente no existe añadimos el texto que viene del ajax y sacamos la cuarta pantalla
+                            document.getElementById("datos_cliente").innerHTML = this.responseText;
+                            show(4);
+                            window.location="#pedir-cita";
+                        }
                     }
+                };
+                xhttp.open("POST", "ajax.php?pagg=" + pagina + "&nombre=" + nombre.value + "&telefono=" + telefono.value + "&correo=" + correo.value + "&nota=" + nota.value + "&fecha=" + getCookie('fecha') + "&hora=" + getCookie('hora') + "&empleado=" + getCookie('empleado') + "&servicio=" + getCookie('servicio'), true);
+                xhttp.send();
+            }
+
+
+
+            //validar datos del cliente y si las cookies han expirado
+            function validar_datos() {
+                var buscarNombre = document.getElementById('nombre').value;
+                var queBuscar = new RegExp("^[A-zА-я]+$");
+
+                if (!queBuscar.test(buscarNombre)) {
+                    document.getElementById("alert-text4").innerHTML = "<h4>Въведеното име е невалидно! Може да използвате само букви на кирилица!</h4>";
+                    document.getElementById("miAlerta2").style.display = "block";
+                    //document.getElementById('nombre').focus();
+                    //document.getElementById('nombre').style.backgroundColor = "#e4b3a7";
+                    return false;
                 }
-            };
-            xhttp.open("POST", "ajax.php?pagg=" + pagina + "&nombre=" + nombre.value + "&telefono=" + telefono.value + "&correo=" + correo.value + "&nota=" + nota.value + "&fecha=" + getCookie('fecha') + "&hora=" + getCookie('hora') + "&empleado=" + getCookie('empleado') + "&servicio=" + getCookie('servicio'), true);
-            xhttp.send();
-        }
 
 
-        //validar datos del cliente
-        function validar_datos() {
-            var buscarNombre = document.getElementById('nombre').value;
-            var queBuscar = new RegExp("^[A-z]+$");
-
-            if (!queBuscar.test(buscarNombre)) {
-                alert("Nombre introducido INCORRECTO");
-                document.getElementById('nombre').focus();
-                document.getElementById('nombre').style.backgroundColor = "#e4b3a7";
-                return false;
-            }
-
-
-            var buscarTelefono = document.getElementById('telefono').value;
-            var queBuscar2 = new RegExp("^[0-9]+$");
-            if (!queBuscar2.test(buscarTelefono)) {
-                alert("Telefono introducido INCORRECTO");
-                document.getElementById('telefono').focus();
-                document.getElementById('telefono').style.backgroundColor = "#e4b3a7";
-                return false;
-            }
-
-
-            var buscarCorreo = document.getElementById('correo').value;
-            var queBuscar3 = new RegExp("^\\S+@\\S+.\\S+$");
-            if (!queBuscar3.test(buscarCorreo)) {
-                alert("Correo introducido INCORRECTO");
-                document.getElementById('correo').focus();
-                document.getElementById('correo').style.backgroundColor = "#e4b3a7";
-                return false;
-            }
-            return true;
-        }
-
-
-
-        function alert_update() {
-            document.getElementById("miAlerta").style.display = "none";
-
-            var nombrecliente = document.getElementById('nombre').value;
-            var telefonocliente = document.getElementById('telefono').value;
-            var correoelectronico = document.getElementById('correo').value;
-
-            console.log(nombrecliente);
-            console.log(telefonocliente);
-            console.log(correoelectronico);
-
-            var xhttp2 = new XMLHttpRequest();
-            xhttp2.onreadystatechange = function () {
-                if (this.readyState == 4 && this.status == 200) {
-                    console.log(this.responseText);
+                var buscarTelefono = document.getElementById('telefono').value;
+                var queBuscar2 = new RegExp("^[0-9]+$");
+                if (!queBuscar2.test(buscarTelefono)) {
+                    document.getElementById("alert-text4").innerHTML = "<h4>Въведеният телефонен номер е невалиден! Може да използвате само цифри!</h4>";
+                    document.getElementById("miAlerta2").style.display = "block";
+                    //document.getElementById('telefono').focus();
+                    //document.getElementById('telefono').style.backgroundColor = "#e4b3a7";
+                    return false;
                 }
-            };
-            xhttp2.open("POST", "ajax2.php?motivo=actualizar_cliente_desde_resrv_cita" + "&nombre_cliente=" + nombrecliente + "&telefono_cliente=" + telefonocliente + "&correo_electronico=" + correoelectronico);
-            xhttp2.send();
-        }
-    </script>
 
 
-    <button id="buton" onclick="show(2); ">Atras</button>
-    <button id="buton" onclick="show(3); validar_datos(); if(validar_datos() == true){datos_cliente(3)}">Sigueinte
-    </button>
+                var buscarCorreo = document.getElementById('correo').value;
+                var queBuscar3 = new RegExp("^\\S+@\\S+.\\S+$");
+                if (!queBuscar3.test(buscarCorreo)) {
+                    document.getElementById("alert-text4").innerHTML = "<h4>Въведеният имейл адрес е невалиден!</h4>";
+                    document.getElementById("miAlerta2").style.display = "block";
+                    //document.getElementById('correo').focus();
+                    //document.getElementById('correo').style.backgroundColor = "#e4b3a7";
+                    return false;
+                }
+
+
+                var cookie_fecha = ("; "+document.cookie).split("; fecha=").pop().split(";").shift();
+                var cookie_hora = ("; "+document.cookie).split("; hora=").pop().split(";").shift();
+                var cookie_diaSemana = ("; "+document.cookie).split("; diaSemana=").pop().split(";").shift();
+                var cookie_empleado = ("; "+document.cookie).split("; empleado=").pop().split(";").shift();
+                var cookie_servicio = ("; "+document.cookie).split("; servicio=").pop().split(";").shift();
+
+                if(cookie_fecha == "" || cookie_hora == "" || cookie_diaSemana == "" || cookie_empleado == "" || cookie_servicio == ""){
+                    document.getElementById("alert-text4").innerHTML = "<h4>Въведеният имейл адрес е невалиден!</h4>";
+                    document.getElementById("miAlerta2").style.display = "block";
+                    return false;
+                }
+
+                return true;
+            }
+
+
+            function alert_update() {
+                document.getElementById("miAlerta").style.display = "none";
+
+                var nombrecliente = document.getElementById('nombre').value;
+                var telefonocliente = document.getElementById('telefono').value;
+                var correoelectronico = document.getElementById('correo').value;
+
+                console.log(nombrecliente);
+                console.log(telefonocliente);
+                console.log(correoelectronico);
+
+                var xhttp2 = new XMLHttpRequest();
+                xhttp2.onreadystatechange = function () {
+                    if (this.readyState == 4 && this.status == 200) {
+                        console.log(this.responseText);
+                    }
+                };
+                xhttp2.open("POST", "ajax2.php?motivo=actualizar_cliente_desde_resrv_cita" + "&nombre_cliente=" + nombrecliente + "&telefono_cliente=" + telefonocliente + "&correo_electronico=" + correoelectronico);
+                xhttp2.send();
+            }
+        </script>
+
+        <div class="clear"></div>
+        <div id="separador"></div>
+        <button id="buton_atras" onclick="show(2); ">Назад</button>
+        <button id="buton_siguiente" onclick="show(3); validar_datos(); if(validar_datos() == true){datos_cliente(3)}">Резервирай!</button>
+    </div>
 </div>
 
 
@@ -354,8 +399,8 @@ if ($conexion->connect_error) {
 
         <span id="alert-text"></span>
         <div id="alert-footer">
-            <span id="alert_actualizar" onclick="alert_update()">Actualizar</span>
-            <span id="alert_cancelar" onclick="alert_cancel()">Cancelar</span>
+            <span id="alert_actualizar" onclick="alert_update()">Обнови</span>
+            <span id="alert_cancelar" onclick="alert_cancel()">Отмени</span>
         </div>
     </div>
 
@@ -365,15 +410,24 @@ if ($conexion->connect_error) {
 <div id="contenedor4" style="display: none">
     <div id="estados">
         <ul class="bookme-pro-steps">
-            <li>Servicio</li>
-            <li>Hora</li>
-            <li>Datos</li>
-            <li class="bookme-pro-steps-is-active">Fin</li>
+            <li>Услуга</li>
+            <li>Час</li>
+            <li>Данни</li>
+            <li class="bookme-pro-steps-is-active">Край</li>
         </ul>
     </div>
     <div id="content">
-        <h3>La reserva fue realizada con exito!</h3>
-        <div id="datos_cliente"></div>
+        <h2>Вашата резервация беше направена успешно!</h2>
+        <h5>Данните на Вашата резервация:</h5>
+        <div id="datos_cliente">
+            <div id="reserva_hecha_servicio"></div>
+            <div id="reserva_hecha_empleado"></div>
+            <div id="reserva_hecha_fecha"></div>
+            <div id="reserva_hecha_hora"></div>
+            <div id="reserva_hecha_nombre"></div>
+            <div id="reserva_hecha_telefono"></div>
+            <div id="reserva_hecha_correo"></div>
+        </div>
     </div>
     <!--
     <button id="buton" onclick="show(3)">Atras</button>
@@ -386,6 +440,21 @@ if ($conexion->connect_error) {
     show(1);
 
     function show(i) {
+        if(i == 2){
+            var datos_elegidos_servicio_c = ("; "+document.cookie).split("; servicio=").pop().split(";").shift();
+            var datos_elegidos_empleado_c = ("; "+document.cookie).split("; empleado=").pop().split(";").shift();
+            var datos_elegidos_fecha_c = ("; "+document.cookie).split("; fecha=").pop().split(";").shift();
+
+
+            document.getElementById("datos_elegidos_servicio").innerHTML = datos_elegidos_servicio_c;
+            document.getElementById("datos_elegidos_empleado").innerHTML = datos_elegidos_empleado_c;
+            document.getElementById("datos_elegidos_fecha").innerHTML = datos_elegidos_fecha_c;
+
+        }else if(i == 3){
+            var datos_elegidos_hora_c = ("; "+document.cookie).split("; hora=").pop().split(";").shift();
+            document.getElementById("datos_elegidos_hora").innerHTML = datos_elegidos_hora_c;
+        }
+
         document.getElementById("contenedor1").style.display = "none";
         document.getElementById("contenedor2").style.display = "none";
         document.getElementById("contenedor3").style.display = "none";
